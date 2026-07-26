@@ -18,7 +18,7 @@
         zephyr,sram = &sram0;
         zephyr,flash = &flash0;
         zmk,kscan = &kscan0;
-        zmk,matrix-transform = &layout_grid_transform;
+        zmk,physical-layout = &hatsu_physical_layout;
     };
 
     layout_grid_transform:
@@ -51,6 +51,8 @@
         status = "disabled";
     };
 };
+
+#include "hatsu_physical_layout.dtsi"
 
 &adc {
     status = "okay";
