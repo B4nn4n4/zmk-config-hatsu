@@ -2,6 +2,6 @@ name: hatsu
 build:
   cmake: .
   kconfig: Kconfig
-settings:
-  board_root: .
-  dts_root: dts
+  settings:
+    board_root: .
+    dts_root: dts
