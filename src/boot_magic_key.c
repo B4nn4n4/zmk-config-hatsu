@@ -14,7 +14,12 @@
 #include <zephyr/toolchain.h>
 #include <zephyr/logging/log.h>
 
-#include <dt-bindings/zmk/reset.h>
+#if IS_ENABLED(CONFIG_RETENTION_BOOT_MODE)
+#include <zephyr/retention/bootmode.h>
+#else
+#include <hal/nrf_power.h>
+#define DFU_MAGIC_UF2_RESET 0x57
+#endif
 
 #include <zmk/event_manager.h>
 #include <zmk/events/position_state_changed.h>
@@ -46,7 +51,13 @@ SYS_INIT(timeout_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 static void trigger_boot_key(const struct boot_key_config *config) {
     if (config->jump_to_bootloader) {
         LOG_INF("Boot key: jumping to bootloader");
-        sys_reboot(RST_UF2);
+#if IS_ENABLED(CONFIG_RETENTION_BOOT_MODE)
+        bootmode_set(BOOT_MODE_TYPE_BOOTLOADER);
+        sys_reboot(SYS_REBOOT_WARM);
+#else
+        nrf_power_gpregret_set(NRF_POWER, DFU_MAGIC_UF2_RESET);
+        sys_reboot(SYS_REBOOT_COLD);
+#endif
     }
 }
 
