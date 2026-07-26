@@ -36,7 +36,7 @@ BUILD_ASSERT(
 
 #define BATTERY_IND_NUM_LEDS DT_PROP_LEN(DT_CHOSEN(zmk_battery_indicator_map), led_channels)
 
-#define GET_LED_CHANNEL_ORDINAL(idx, node_id) DT_CHILD_IDX(DT_PHANDLE_BY_IDX(node_id, led_channels, idx))
+#define GET_LED_CHANNEL_ORDINAL(idx, node_id) DT_NODE_CHILD_IDX(DT_PHANDLE_BY_IDX(node_id, led_channels, idx))
 
 static const uint8_t battery_indicator_map_array[] = {LISTIFY(
     BATTERY_IND_NUM_LEDS, GET_LED_CHANNEL_ORDINAL, (, ), DT_CHOSEN(zmk_battery_indicator_map))};
