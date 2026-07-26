@@ -11,8 +11,8 @@ The 4 RGB LEDs per side get a proper state-based design. Priority order (highest
 | SoC > 80% | Pulse the current color |
 | SoC < 20% | Solid red |
 | Battery check (`&bat`) | Bar in **green** (was blue) |
-| Layer 2 active | `[white white off off]` |
-| Layer 3 active | `[white white off off]` → `[off off white white]` |
+| Layer 2 ("upper") active | White `[on on off off]` |
+| Layer 3 ("lower") active | White `[off off on on]` |
 | Idle | Gentle animation across the 4 LEDs (replaces solid pink `0xC70039`) |
 
 Implementation notes:
