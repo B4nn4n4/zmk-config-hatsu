@@ -1,6 +1,7 @@
 /dts-v1/;
 
 #include "hatsu.dtsi"
+#include <common/nordic/nrf52840_uf2_boot_mode.dtsi>
 
 / {
     chosen {
