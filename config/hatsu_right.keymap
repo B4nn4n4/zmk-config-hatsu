@@ -9,6 +9,14 @@
 #define SYSTEM 2
 
 / {
+    behaviors {
+        bat: behavior_battery_indicator {
+            compatible = "zmk,behavior-battery-indicator";
+            display-name = "Battery Indicator";
+            #binding-cells = <0>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
         layer_1 {
