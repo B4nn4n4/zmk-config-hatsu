@@ -22,6 +22,12 @@ J-Link 20-pin header:
 - pin 7 SWDIO, pin 9 SWCLK, pin 4/6 GND -> Hatsu SWD through-holes (tilt pins for contact)
 - **jumper VTref (pin 1) to the J-Link's own 3.3V (pin 2)** — required voltage reference
 
+SWD pin locations on both halves (marked G / IO / CLK, left half also has +3V):
+
+<p align="center">
+  <img src="pinout.png" alt="Hatsu SWD pinout, left and right halves" />
+</p>
+
 Then power the Hatsu half via its USB-C, and plug the J-Link into USB.
 
 ## Flash (per half)
