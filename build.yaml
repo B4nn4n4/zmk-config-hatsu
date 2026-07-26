@@ -2,5 +2,5 @@
 # See https://zmk.dev/docs/customization#building-additional-keyboards
 ---
 include:
-  - board: angry_miao_hatsu_left
-  - board: angry_miao_hatsu_right
+  - board: hatsu_left
+  - board: hatsu_right

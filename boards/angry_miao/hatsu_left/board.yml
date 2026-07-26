@@ -1,0 +1,5 @@
+board:
+  name: hatsu_left
+  vendor: angry_miao
+  socs:
+    - name: nrf52840
