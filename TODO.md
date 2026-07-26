@@ -1,48 +1,25 @@
 # TODO — Hatsu firmware roadmap
 
-## 1. RGB battery indicator rework (`src/battery_indicator.c`)
+## Verify on hardware
 
-The 4 RGB LEDs per side get a proper state-based design. Priority order (highest first):
-
-| State | Pattern |
-|---|---|
-| System layer active, BT profile selected | Profile position in blue: profile 1 = `[on off off off]`, 2 = `[off on off off]`, etc. (orientation to be verified on hardware) |
-| Pairing mode (profile selected, not yet connected) | Pulse blue |
-| SoC > 80% | Pulse the current color |
-| SoC < 20% | Solid red |
-| Battery check (`&bat`) | Bar in **green** (was blue) |
-| Layer 2 ("upper") active | White `[on on off off]` |
-| Layer 3 ("lower") active | White `[off off on on]` |
-| Idle | Gentle animation across the 4 LEDs (replaces solid pink `0xC70039`) |
-
-Implementation notes:
-- Needs event listeners for: layer state changed (`zmk_layer_state_changed`), BT profile
-  selected/connected (`zmk_ble_active_profile_changed` / connection events), activity state.
-- Battery colors live in the board defconfigs (`CONFIG_ZMK_BATTERY_INDICATOR_COLOR` → green `0x00FF00`).
-- The default pink should go away entirely once idle animation exists.
-
-## 2. Layers
-
-- Current: `default(0)`, `function(1)`, `system(2)` — bindings use **named** refs (`&mo FUNCTION`, `&mo SYSTEM`), so inserting a layer is safe.
-- Insert one new layer between `function` and `system` (all `&trans`), giving 4 layers total
-  (default + function + 2 new + system). User renames/maps in ZMK Studio (will be named upper/lower).
-- Add 2 `reserved` layers too so Studio can use them later.
-- Layer indication LEDs (see table above) for layers 2 and 3.
-
-## 3. Deep sleep
-
-- `CONFIG_ZMK_SLEEP=y` in both defconfigs
-- Add `wakeup-source;` to the kscan node in both board dts files
-- Verify: halves sleep, wake on keypress, re-pair cleanly, battery indicator still behaves
-
-## 4. Charge indication (stretch)
-
-- CW2015 is read-only (no charge control possible — no charger IC interface found)
-- Optional: low-battery blink / charging-state colors if a charging source can be detected
-  (USB connected = `zmk_usb_conn_state_changed`)
+- Battery indicator states (priority order): `&bat` green bar > system-layer profile
+  position (blue, pulsing while unpaired) > SoC > 80% green pulse > SoC < 20% solid red >
+  layer 2/3 white indication > USB charging pulse > idle sweep animation
+- Profile LED orientation (profile 1 = leftmost RGB LED?)
+- Deep sleep: halves sleep, wake on keypress, re-pair cleanly, indicator resumes
+- Idle animation brightness (`IDLE_PEAK` in `src/battery_indicator.c`) — may want tuning
 
 ## Done
 
+- [x] RGB battery indicator rework: state-based render loop with layer/BLE/battery/USB/
+      activity event listeners; pink default removed; `&bat` bar now green; gentle idle
+      sweep animation; layer 2 = white `[on on off off]`, layer 3 = white `[off off on on]`
+- [x] Layers: `upper`(2) + `lower`(3) inserted (all `&trans`), 2 `reserved` layers added;
+      `system` moved to index 4 (fixed missing thumb row: 48 → 52 bindings)
+- [x] Deep sleep: `CONFIG_ZMK_SLEEP=y` + `wakeup-source` on both kscan nodes
+- [x] Charge indication: green pulsing bar at SoC length while USB powered
+      (`CONFIG_ZMK_BATTERY_INDICATOR_CHARGING`); no charger IC interface exists, so USB
+      power is the only detectable charging source
 - [x] Board port to upstream ZMK (Zephyr 4.1, HWMv2)
 - [x] AW20216S + CW2015 out-of-tree drivers
 - [x] ZMK Studio (physical layout with rotated thumbs)

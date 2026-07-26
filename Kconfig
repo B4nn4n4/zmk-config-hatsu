@@ -37,17 +37,31 @@ config ZMK_BATTERY_INDICATOR_DURATION
 
 config ZMK_BATTERY_INDICATOR_COLOR
     hex "Battery indicator color, when indicating, as hex 0xRRGGBB"
-    default 0x0000FF
-
-config ZMK_BATTERY_INDICATOR_DEFAULT_COLOR
-    hex "Battery indicator default color as hex 0xRRGGBB"
     default 0x00FF00
 
-config ZMK_BATTERY_INDICATOR_BAR
-    bool "Battery indicator as a bar"
+config ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD
+    int "State of charge percent above which the indicator pulses"
+    default 80
 
-config ZMK_BATTERY_INDICATOR_BRIGHTNESS
-    bool "Battery indicator as brightness"
+config ZMK_BATTERY_INDICATOR_LOW_THRESHOLD
+    int "State of charge percent below which the indicator shows solid red"
+    default 20
+
+config ZMK_BATTERY_INDICATOR_SYSTEM_LAYER
+    int "Layer ID that shows the BT profile position while active"
+    default 4
+
+config ZMK_BATTERY_INDICATOR_UPPER_LAYER
+    int "Layer ID indicated with the first two LEDs lit white"
+    default 2
+
+config ZMK_BATTERY_INDICATOR_LOWER_LAYER
+    int "Layer ID indicated with the last two LEDs lit white"
+    default 3
+
+config ZMK_BATTERY_INDICATOR_CHARGING
+    bool "Pulse the battery bar while USB power is connected"
+    default y
 
 DT_COMPAT_ZMK_BOOT_MAGIC_KEY := zmk,boot-magic-key
 

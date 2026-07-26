@@ -6,7 +6,9 @@
 
 #define DEFAULT 0
 #define FUNCTION 1
-#define SYSTEM 2
+#define UPPER 2
+#define LOWER 3
+#define SYSTEM 4
 
 / {
     behaviors {
@@ -33,7 +35,7 @@
             &mo FUNCTION &kp Z &kp X &kp C &kp V &kp B      &kp N &kp M &kp COMMA &kp PERIOD &kp SLASH &mo FUNCTION
                         &kp CAPS &tog FUNCTION                              &kp LBKT &kp RBKT
                         &kp LSHIFT &kp SPACE                                &kp ENTER &kp BACKSPACE
-                        &kp LALT &kp LCTRL                                  &kp RCTRL &kp RALT 
+                        &kp LALT &kp LCTRL                                  &kp RCTRL &kp RALT
                         &mo SYSTEM &kp DEL                                  &kp RGUI &mo SYSTEM
             >;
         };
@@ -42,23 +44,77 @@
             label = "function";
             bindings = <
             &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6                &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12
-            &kp N1 &kp N2 &kp N3 &kp N4 &kp N5 &kp N6                &kp N7 &kp N8 &kp N9 &kp N0 &kp MINUS &kp EQUAL 
+            &kp N1 &kp N2 &kp N3 &kp N4 &kp N5 &kp N6                &kp N7 &kp N8 &kp N9 &kp N0 &kp MINUS &kp EQUAL
             &trans &kp GRAVE &kp PSCRN &kp INS &kp HOME &kp END      &kp PG_UP &kp PG_DN &kp K_APP &kp UP &kp RIGHT &trans
-                        &trans &trans                                             &kp LEFT &kp DOWN 
+                        &trans &trans                                             &kp LEFT &kp DOWN
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
             >;
         };
+
         layer_3 {
+            label = "upper";
+            bindings = <
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+            >;
+        };
+
+        layer_4 {
+            label = "lower";
+            bindings = <
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+            >;
+        };
+
+        layer_5 {
             label = "system";
             bindings = <
             &bl BL_TOG &bat &sys_reset &bootl &bt BT_CLR &trans                &trans &bt BT_CLR &bootl &sys_reset &bat &bl BL_TOG
             &bt BT_NXT &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
-            &bt BT_PRV &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans
+            &bt BT_PRV &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
                    &trans &trans                                                   &trans &trans
                    &trans &trans                                                   &trans &trans
                    &trans &trans                                                   &trans &trans
+                   &trans &trans                                                   &trans &trans
+            >;
+        };
+
+        layer_6 {
+            label = "reserved";
+            bindings = <
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+            >;
+        };
+
+        layer_7 {
+            label = "reserved";
+            bindings = <
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &trans &trans
             >;
         };
     };
