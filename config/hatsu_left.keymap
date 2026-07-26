@@ -10,13 +10,13 @@
 
 / {
     behaviors {
-        bat: behavior_battery_indicator {
+        bat: bat {
             compatible = "zmk,behavior-battery-indicator";
             display-name = "Battery Indicator";
             #binding-cells = <0>;
         };
 
-        bootl: behavior_hatsu_bootloader {
+        bootl: bootl {
             compatible = "hatsu,behavior-bootloader";
             display-name = "Bootloader";
             #binding-cells = <0>;
