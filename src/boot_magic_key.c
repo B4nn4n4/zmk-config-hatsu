@@ -13,7 +13,6 @@
 #include <zephyr/sys/reboot.h>
 #include <zephyr/toolchain.h>
 #include <zephyr/logging/log.h>
-#include <hal/nrf_power.h>
 
 #define DFU_MAGIC_UF2_RESET 0x57
 
@@ -47,7 +46,7 @@ SYS_INIT(timeout_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 static void trigger_boot_key(const struct boot_key_config *config) {
     if (config->jump_to_bootloader) {
         LOG_INF("Boot key: jumping to bootloader");
-        nrf_power_gpregret_set(NRF_POWER, DFU_MAGIC_UF2_RESET);
+        NRF_POWER->GPREGRET = DFU_MAGIC_UF2_RESET;
         sys_reboot(SYS_REBOOT_COLD);
     }
 }

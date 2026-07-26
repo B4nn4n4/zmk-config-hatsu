@@ -9,7 +9,6 @@
 #include <zephyr/device.h>
 #include <zephyr/sys/reboot.h>
 #include <zephyr/logging/log.h>
-#include <hal/nrf_power.h>
 
 #include <drivers/behavior.h>
 #include <zmk/behavior.h>
@@ -23,7 +22,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 static int on_keymap_binding_pressed(struct zmk_behavior_binding *binding,
                                      struct zmk_behavior_binding_event event) {
     LOG_INF("Jumping to UF2 bootloader");
-    nrf_power_gpregret_set(NRF_POWER, DFU_MAGIC_UF2_RESET);
+    NRF_POWER->GPREGRET = DFU_MAGIC_UF2_RESET;
     sys_reboot(SYS_REBOOT_COLD);
     return ZMK_BEHAVIOR_OPAQUE;
 }
