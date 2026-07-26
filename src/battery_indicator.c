@@ -29,11 +29,13 @@
 #include <zmk/ble.h>
 #endif
 
-#if IS_ENABLED(CONFIG_ZMK_USB)
+#if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
 #include <zmk/usb.h>
 #endif
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
+
+#define KEYMAP_LOCAL (!IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL))
 
 #define RED 0
 #define GREEN 1
@@ -179,6 +181,7 @@ static enum indicator_state evaluate_state(void) {
         return IND_STATE_BAT_BAR;
     }
 
+#if KEYMAP_LOCAL
     if (zmk_keymap_layer_active(CONFIG_ZMK_BATTERY_INDICATOR_SYSTEM_LAYER)) {
 #if IS_ENABLED(CONFIG_ZMK_BLE)
         if (zmk_ble_active_profile_is_connected()) {
@@ -187,6 +190,7 @@ static enum indicator_state evaluate_state(void) {
 #endif
         return IND_STATE_PAIRING;
     }
+#endif
 
     uint8_t soc = zmk_battery_state_of_charge();
 
@@ -198,6 +202,7 @@ static enum indicator_state evaluate_state(void) {
         return IND_STATE_LOW;
     }
 
+#if KEYMAP_LOCAL
     if (zmk_keymap_layer_active(CONFIG_ZMK_BATTERY_INDICATOR_UPPER_LAYER)) {
         return IND_STATE_UPPER;
     }
@@ -205,8 +210,9 @@ static enum indicator_state evaluate_state(void) {
     if (zmk_keymap_layer_active(CONFIG_ZMK_BATTERY_INDICATOR_LOWER_LAYER)) {
         return IND_STATE_LOWER;
     }
+#endif
 
-#if IS_ENABLED(CONFIG_ZMK_USB) && IS_ENABLED(CONFIG_ZMK_BATTERY_INDICATOR_CHARGING)
+#if IS_ENABLED(CONFIG_USB_DEVICE_STACK) && IS_ENABLED(CONFIG_ZMK_BATTERY_INDICATOR_CHARGING)
     if (zmk_usb_is_powered()) {
         return IND_STATE_CHARGING;
     }
@@ -328,12 +334,18 @@ static int indicator_event_listener(const zmk_event_t *eh) {
 }
 
 ZMK_LISTENER(battery_indicator, indicator_event_listener);
+#if KEYMAP_LOCAL
 ZMK_SUBSCRIPTION(battery_indicator, zmk_layer_state_changed);
+ZMK_SUBSCRIPTION(battery_indicator, zmk_endpoint_changed);
+#endif
 ZMK_SUBSCRIPTION(battery_indicator, zmk_battery_state_changed);
 ZMK_SUBSCRIPTION(battery_indicator, zmk_activity_state_changed);
+#if IS_ENABLED(CONFIG_ZMK_BLE)
 ZMK_SUBSCRIPTION(battery_indicator, zmk_ble_active_profile_changed);
-ZMK_SUBSCRIPTION(battery_indicator, zmk_endpoint_changed);
+#endif
+#if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
 ZMK_SUBSCRIPTION(battery_indicator, zmk_usb_conn_state_changed);
+#endif
 
 static int zmk_battery_indicator_init(void) {
     return k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_work);
