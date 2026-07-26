@@ -3,3 +3,5 @@ board:
   vendor: angry_miao
   socs:
     - name: nrf52840
+      variants:
+        - name: zmk
