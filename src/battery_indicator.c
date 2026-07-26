@@ -25,7 +25,11 @@
 #include <zmk/events/endpoint_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
 
-#if IS_ENABLED(CONFIG_ZMK_BLE)
+#define KEYMAP_LOCAL (!IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL))
+
+#define BLE_PROFILES_AVAILABLE (IS_ENABLED(CONFIG_ZMK_BLE) && KEYMAP_LOCAL)
+
+#if BLE_PROFILES_AVAILABLE
 #include <zmk/ble.h>
 #endif
 
@@ -34,8 +38,6 @@
 #endif
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
-
-#define KEYMAP_LOCAL (!IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL))
 
 #define RED 0
 #define GREEN 1
@@ -163,7 +165,7 @@ static uint8_t pulse_brightness(void) {
 }
 
 static uint8_t active_profile_led(void) {
-#if IS_ENABLED(CONFIG_ZMK_BLE)
+#if BLE_PROFILES_AVAILABLE
     int idx = zmk_ble_active_profile_index();
     if (idx >= 0 && idx < NUM_RGB_LEDS) {
         return idx;
@@ -183,7 +185,7 @@ static enum indicator_state evaluate_state(void) {
 
 #if KEYMAP_LOCAL
     if (zmk_keymap_layer_active(CONFIG_ZMK_BATTERY_INDICATOR_SYSTEM_LAYER)) {
-#if IS_ENABLED(CONFIG_ZMK_BLE)
+#if BLE_PROFILES_AVAILABLE
         if (zmk_ble_active_profile_is_connected()) {
             return IND_STATE_PROFILE;
         }
@@ -340,7 +342,7 @@ ZMK_SUBSCRIPTION(battery_indicator, zmk_endpoint_changed);
 #endif
 ZMK_SUBSCRIPTION(battery_indicator, zmk_battery_state_changed);
 ZMK_SUBSCRIPTION(battery_indicator, zmk_activity_state_changed);
-#if IS_ENABLED(CONFIG_ZMK_BLE)
+#if BLE_PROFILES_AVAILABLE
 ZMK_SUBSCRIPTION(battery_indicator, zmk_ble_active_profile_changed);
 #endif
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
