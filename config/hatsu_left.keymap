@@ -30,13 +30,13 @@
         layer_1 {
             label = "default";
             bindings = <
-            &kp ESC &kp Q &kp W &kp E &kp R &kp T           &kp Y &kp U &kp I &kp O &kp P &kp BACKSLASH
-            &kp TAB &kp A &kp S &kp D &kp F &kp G           &kp H &kp J &kp K &kp L &kp SEMICOLON &kp APOSTROPHE
-            &mo FUNCTION &kp Z &kp X &kp C &kp V &kp B      &kp N &kp M &kp COMMA &kp PERIOD &kp SLASH &mo FUNCTION
-                        &kp CAPS &tog FUNCTION                              &kp LBKT &kp RBKT
-                        &kp LSHIFT &kp SPACE                                &kp ENTER &kp BACKSPACE
-                        &kp LALT &kp LCTRL                                  &kp RCTRL &kp RALT
-                        &mo SYSTEM &kp DEL                                  &kp RGUI &mo SYSTEM
+            &kp TAB &kp Q &kp W &kp E &kp R &kp T           &kp Y &kp U &kp I &kp O &kp P &kp BSPC
+            &mt LCTRL ESC &kp A &kp S &kp D &kp F &kp G     &kp H &kp J &kp K &kp L &kp SEMICOLON &kp SQT
+            &kp LSHFT &kp Z &kp X &kp C &kp V &kp B         &kp N &kp M &kp COMMA &kp PERIOD &kp SLASH &kp RIGHT_SHIFT
+                        &kp CAPS &kp LCTRL                                  &kp LBKT &kp RBKT
+                        &kp LGUI &mt LEFT_ALT RET                           &kp SPACE &kp RALT
+                        &kp LALT &mo UPPER                                  &mo LOWER &kp RALT
+                        &mo SYSTEM &mo FUNCTION                             &kp RGUI &mo SYSTEM
             >;
         };
 
@@ -56,9 +56,9 @@
         layer_3 {
             label = "upper";
             bindings = <
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &kp N1  &kp N2  &kp N3  &kp N4  &kp N5            &kp N6  &kp N7  &kp N8  &kp N9  &kp N0  &kp DEL
+            &trans &trans &trans &trans &trans &trans                &kp LEFT  &kp DOWN  &kp UP  &kp RIGHT  &trans  &trans
+            &trans &studio_unlock  &trans  &trans  &trans  &trans    &kp HOME  &kp PAGE_DOWN  &kp PG_UP  &kp END  &trans  &kp PRINTSCREEN
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
@@ -69,9 +69,9 @@
         layer_4 {
             label = "lower";
             bindings = <
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &kp GRAVE  &kp EXCL  &kp AT  &kp HASH  &kp DLLR  &kp PRCNT  &kp CARET  &kp AMPS  &kp KP_MULTIPLY  &kp LPAR  &kp RPAR  &kp DELETE
+            &kp TILDE  &trans  &trans  &trans  &trans  &trans           &kp MINUS  &kp EQUAL  &kp LBKT  &kp RBKT  &kp BSLH  &kp GRAVE
+            &kp LSHFT  &trans  &trans  &trans  &trans  &trans           &kp UNDER  &kp PLUS  &kp LBRC  &kp RBRC  &kp PIPE  &kp TILDE
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
