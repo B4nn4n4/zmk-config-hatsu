@@ -9,6 +9,7 @@
 #define UPPER 2
 #define LOWER 3
 #define SYSTEM 4
+#define MOUSE 5
 
 / {
     behaviors {
@@ -36,7 +37,7 @@
                         &kp CAPS &kp LCTRL                                  &kp LBKT &kp RBKT
                         &kp LGUI &mt LEFT_ALT RET                           &kp SPACE &kp RALT
                         &kp LALT &mo UPPER                                  &mo LOWER &kp RALT
-                        &mo SYSTEM &mo FUNCTION                             &kp RGUI &mo SYSTEM
+                        &mo SYSTEM &mo FUNCTION                             &mo MOUSE &mo SYSTEM
             >;
         };
 
@@ -93,11 +94,11 @@
         };
 
         layer_6 {
-            label = "reserved";
+            label = "mouse";
             bindings = <
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
-            &trans &trans &trans &trans &trans &trans                &trans &trans &trans &trans &trans &trans
+            &trans &trans &trans &trans &trans &trans                &mkp LCLK       &mkp MCLK       &mkp RCLK     &trans          &trans &trans
+            &trans &trans &trans &trans &trans &trans                &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT &trans &trans
+            &trans &trans &trans &trans &trans &trans                &msc SCRL_LEFT  &msc SCRL_DOWN  &msc SCRL_UP  &msc SCRL_RIGHT &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
