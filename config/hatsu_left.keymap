@@ -41,11 +41,11 @@
         layer_1 {
             label = "default";
             bindings = <
-     		&none   &kp Q           &kp W         &kp E         &kp R         &kp T         &kp	Y       &kp U          &kp I         &kp O         &kp P &none
+     		&kp ESC   &kp Q           &kp W         &kp E         &kp R         &kp T         &kp	Y       &kp U          &kp I         &kp O         &kp P &none
 		&none  &bhm LSHIFT A   &bhm LALT S   &bhm LGUI D   &bhm LCTRL F  &kp G         &kp H       &bhm LCTRL K    &bhm LGUI K   &bhm LALT L   &bhm LSHIFT SEMI &none
-		&none  &kp Z           &kp X         &kp C         &kp V         &kp B         &kp N       &kp M           &kp CMMA      &kp DOT       &kp FSLH &none
+		&kp BSLH  &kp Z           &kp X         &kp C         &kp V         &kp B         &kp N       &kp M           &kp CMMA      &kp DOT       &kp FSLH &none
                         &none &none                                 	 	&kp LBKT &kp RBKT
-                        &none &lt 1 SPACE	                           	&lt 2 BSPC &lt 3 ENTER
+                        &lt 1 SPACE &none                           	&lt 2 BSPC &lt 3 ENTER
                         &none &none             	                     	&none 	 &none
                         &mo SYSTEM &mo FUNCTION                             	&mo MOUSE &mo SYSTEM
             >;
