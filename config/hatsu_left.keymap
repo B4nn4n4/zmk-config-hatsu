@@ -14,6 +14,15 @@
 
 / {
     behaviors {
+        bhm: bhm {
+      compatible = "zmk,behavior-hold-tap";
+      #binding-cells = <2>;
+      tapping-term-ms = <200>;
+      quick-tap-ms = <0>;
+      flavor = "balanced";
+      bindings = <&kp>, <&kp>;
+    }; 
+
         bat: bat {
             compatible = "zmk,behavior-battery-indicator";
             display-name = "Battery Indicator";
@@ -32,23 +41,23 @@
         layer_1 {
             label = "default";
             bindings = <
-            &none &kp Q &kp W &kp E &kp R &kp T           &kp Y &kp U &kp I &kp O &kp P &kp BSPC
-            &mt LCTRL ESC &kp A &kp S &kp D &kp F &kp G     &kp H &kp J &kp K &kp L &kp SEMICOLON &kp SQT
-            &kp LSHFT &kp Z &kp X &kp C &kp V &kp B         &kp N &kp M &kp COMMA &kp PERIOD &kp SLASH &kp RIGHT_SHIFT
-                        &kp CAPS &kp LCTRL                                  &kp LBKT &kp RBKT
-                        &kp LGUI &mt LEFT_ALT RET                           &kp SPACE &kp RALT
-                        &kp LALT &mo UPPER                                  &mo LOWER &kp RALT
-                        &mo SYSTEM &mo FUNCTION                             &mo MOUSE &mo SYSTEM
+     		&none   &kp Q           &kp W         &kp E         &kp R         &kp T         &kp	Y       &kp U          &kp I         &kp O         &kp P &none
+		&none  &bhm LSHIFT A   &bhm LALT S   &bhm LGUI D   &bhm LCTRL F  &kp G         &kp H       &bhm LCTRL K    &bhm LGUI K   &bhm LALT L   &bhm LSHIFT SEMI &none
+		&none  &kp Z           &kp X         &kp C         &kp V         &kp B         &kp N       &kp M           &kp CMMA      &kp DOT       &kp FSLH &none
+                        &none &none                                 	 	&kp LBKT &kp RBKT
+                        &none &lt 1 SPACE	                           	&lt 2 BSPC &lt 3 ENTER
+                        &none &none             	                     	&none 	 &none
+                        &mo SYSTEM &mo FUNCTION                             	&mo MOUSE &mo SYSTEM
             >;
         };
 
         layer_2 {
-            label = "function";
+            label = "num";
             bindings = <
-            &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6                &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12
-            &kp N1 &kp N2 &kp N3 &kp N4 &kp N5 &kp N6                &kp N7 &kp N8 &kp N9 &kp N0 &kp MINUS &kp EQUAL
-            &trans &kp GRAVE &kp PSCRN &kp INS &kp HOME &kp END      &kp PG_UP &kp PG_DN &kp K_APP &kp UP &kp RIGHT &trans
-                        &trans &trans                                             &kp LEFT &kp DOWN
+        &kp F11 &kp F7         &kp F5        &kp F3        &kp F1        &kp F9        &kp F10     &kp F2          &kp  F4       &kp F6        &kp F8 &kp F12
+        &none &bhm LSHIFT N7  &bhm LALT N5  &bhm LGUI N3  &bhm LCTRL N1 &kp N9        &kp N0      &bhm LCTRL N2   &bhm LGUI N4  &bhm LALT N6  &bhm LSHIFT N8 &none
+        &none &kp BSLH        &kp SQT       &none         &none         &none         &none       &kp LBKT        &kp RBKT      &kp MINUS     &kp EQUAL &none
+                        &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
@@ -56,11 +65,11 @@
         };
 
         layer_3 {
-            label = "upper";
+            label = "function";
             bindings = <
-            &trans &kp N1  &kp N2  &kp N3  &kp N4  &kp N5            &kp N6  &kp N7  &kp N8  &kp N9  &kp N0  &kp DEL
-            &trans &trans &trans &trans &trans &trans                &kp LEFT  &kp DOWN  &kp UP  &kp RIGHT  &trans  &trans
-            &trans &studio_unlock  &trans  &trans  &trans  &trans    &kp HOME  &kp PAGE_DOWN  &kp PG_UP  &kp END  &trans  &kp PRINTSCREEN
+        &none &kp ESC         &kp HOME      &kp UP        &kp END       &none         &bootloader	&tog 5          &tog 6        &none         &kp DEL &none
+        &none &kp TAB         &kp LEFT      &kp DOWN      &kp RIGHT     &none         &none       &kp LCTRL       &kp LGUI      &kp LALT      &bhm LSHIFT K_CMENU &none
+        &none &none          &kp C_PREV    &kp C_PP      &kp C_NEXT    &none         &sys_reset  &none           &none         &none         &none &none
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
@@ -69,12 +78,12 @@
         };
 
         layer_4 {
-            label = "lower";
+            label = "gaming";
             bindings = <
-            &kp GRAVE  &kp EXCL  &kp AT  &kp HASH  &kp DLLR  &kp PRCNT  &kp CARET  &kp AMPS  &kp KP_MULTIPLY  &kp LPAR  &kp RPAR  &kp DELETE
-            &kp TILDE  &trans  &trans  &trans  &trans  &trans           &kp MINUS  &kp EQUAL  &kp LBKT  &kp RBKT  &kp BSLH  &kp GRAVE
-            &kp LSHFT  &trans  &trans  &trans  &trans  &trans           &kp UNDER  &kp PLUS  &kp LBRC  &kp RBRC  &kp PIPE  &kp TILDE
-                        &trans &trans                                             &trans &trans
+             &ESC &kp Q &kp W &kp E &kp R &kp T           &kp Y &kp U &kp I &kp O &kp P &kp none
+            &kp TAB &kp A &kp S &kp D &kp F &kp G     &kp H &kp J &kp K &kp L &kp SEMICOLON &kp none
+            &none &kp Z &kp X &kp C &kp V &kp B         &kp N &kp M &kp COMMA &kp PERIOD &kp SLASH &kp none	                
+	       		&trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
