@@ -306,9 +306,7 @@ static void indicator_work_handler(struct k_work *work) {
         k_timer_stop(&indicator_timer);
     }
 
-    if (state != last_state || state_needs_ticks(state)) {
-        render(state);
-    }
+    render(state);
 
     last_state = state;
 }
