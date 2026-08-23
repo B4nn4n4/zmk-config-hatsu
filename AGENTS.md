@@ -73,6 +73,10 @@ no local toolchain here.
   CI for reasons never pinned down — do NOT retry that scheme; use the separate
   `zmk,layer-colors` chosen node (proven to compile green). BUILD_ASSERTs in
   battery_indicator.c (`DT_PROP_BY_IDX != 0`) catch silent drops at compile time
+- Module source files are listed EXPLICITLY in the root `CMakeLists.txt` — a new .c
+  file that isn't added compiles into NOTHING and fails silently (e.g. a behavior
+  device simply never exists; runtime name-lookup invocations just log a warning and
+  no-op). When adding sources, always extend the CMakeLists list
 - ZMK compiles several events' implementations ONLY into the central build
   (`app/CMakeLists.txt` wraps e.g. `layer_state_changed.c`, `endpoint_changed.c`,
   `ble_active_profile_changed.c` in the `(!SPLIT || ROLE_CENTRAL)` block). Referencing
