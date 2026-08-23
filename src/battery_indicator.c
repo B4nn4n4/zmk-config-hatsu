@@ -363,9 +363,6 @@ int zmk_battery_indicator_show(void) {
 
 static int indicator_event_listener(const zmk_event_t *eh) {
     const struct zmk_activity_state_changed *activity_ev = as_zmk_activity_state_changed(eh);
-    const struct zmk_layer_state_changed *layer_ev = as_zmk_layer_state_changed(eh);
-    const struct zmk_split_peripheral_status_changed *periph_ev =
-        as_zmk_split_peripheral_status_changed(eh);
 
     if (activity_ev) {
         activity_state = activity_ev->state;
@@ -373,7 +370,13 @@ static int indicator_event_listener(const zmk_event_t *eh) {
 
 #if KEYMAP_LOCAL && LAYER_COLORS_ENABLED
     // Relay on layer changes, on wake from idle, and when a peripheral reconnects
-    // (it missed every update while asleep).
+    // (it missed every update while asleep). The layer-state event implementation is
+    // only compiled into the central build, so these references must stay in this
+    // guard or the peripheral link fails.
+    const struct zmk_layer_state_changed *layer_ev = as_zmk_layer_state_changed(eh);
+    const struct zmk_split_peripheral_status_changed *periph_ev =
+        as_zmk_split_peripheral_status_changed(eh);
+
     if (layer_ev || activity_ev || (periph_ev && periph_ev->connected)) {
         send_remote_layer_color();
     }
