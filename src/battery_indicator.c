@@ -220,10 +220,6 @@ static enum indicator_state evaluate_state(void) {
 
     uint8_t soc = zmk_battery_state_of_charge();
 
-    if (soc > CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD) {
-        return IND_STATE_HIGH;
-    }
-
     if (soc < CONFIG_ZMK_BATTERY_INDICATOR_LOW_THRESHOLD) {
         return IND_STATE_LOW;
     }
@@ -234,6 +230,10 @@ static enum indicator_state evaluate_state(void) {
         return IND_STATE_LAYER;
     }
 #endif
+
+    if (soc > CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD) {
+        return IND_STATE_HIGH;
+    }
 
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK) && IS_ENABLED(CONFIG_ZMK_BATTERY_INDICATOR_CHARGING)
     if (zmk_usb_is_powered()) {
