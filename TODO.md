@@ -4,7 +4,7 @@
 
 - Battery indicator states (priority order): `&bat` green bar > system-layer profile
   position (blue, pulsing while unpaired) > SoC < 20% solid red > per-layer colors
-  (keymap `indicator` subnodes) > SoC > 80% green pulse (hidden while a colored layer
+  (zmk,layer-colors chosen node) > SoC > 80% green pulse (hidden while a colored layer
   is active) > USB charging pulse > idle sweep animation
 - Profile LED orientation (profile 1 = leftmost RGB LED?)
 - Deep sleep: halves sleep, wake on keypress, re-pair cleanly, indicator resumes
@@ -12,11 +12,14 @@
 
 ## Done
 
-- [x] Per-layer RGB indication: `indicator { compatible = "hatsu,layer-indicator";
-      color = <...>; };` subnodes inside keymap layer definitions (child-binding
-      recursion drops undeclared props, hence the dedicated binding); num=cyan,
-      function=magenta, gaming=orange, mouse=yellow, system keeps BT-profile display.
-      Replaces old upper/lower white patterns and their Kconfig entries
+- [x] Per-layer RGB indication: top-level `layer_colors` node in the keymap
+      (`compatible = "zmk,layer-colors"`, one uint32 per layer index, 0 = none) selected
+      via `chosen { zmk,layer-colors = &layer_colors; }`; num=cyan, function=magenta,
+      gaming=orange, mouse=yellow, system keeps BT-profile display. Replaces old
+      upper/lower white patterns and their Kconfig entries. NOTE: an inline-subnode
+      scheme (`indicator { color = ...; }` under each layer + dedicated binding) kept
+      silently dropping props in CI even with the binding present — chosen-node table is
+      the proven path; BUILD_ASSERTs in battery_indicator.c guard against drops
 - [x] RGB battery indicator rework: state-based render loop with layer/BLE/battery/USB/
       activity event listeners; pink default removed; `&bat` bar now green; gentle idle
       sweep animation; layer 2 = white `[on on off off]`, layer 3 = white `[off off on on]`

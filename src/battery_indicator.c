@@ -82,28 +82,18 @@ static const uint8_t battery_indicator_map_array[] = {LISTIFY(
 static const uint8_t battery_indicator_color_map[] =
     DT_PROP(DT_CHOSEN(zmk_battery_indicator_map), colors);
 
-#define LAYER_COLORS_ENABLED DT_HAS_COMPAT_STATUS_OKAY(zmk_keymap)
+#define LAYER_COLORS_ENABLED DT_HAS_CHOSEN(zmk_layer_colors)
 
 #if LAYER_COLORS_ENABLED
-#define LAYER_COLOR_VALUE(node_id)                                                             \
-    COND_CODE_1(DT_NODE_HAS_PROP(DT_CHILD(node_id, indicator), color),                         \
-                (DT_PROP(DT_CHILD(node_id, indicator), color)), (0))
+static const uint32_t layer_color_table[] = DT_PROP(DT_CHOSEN(zmk_layer_colors), colors);
 
-#define LAYER_COLOR_ENTRY(node_id) LAYER_COLOR_VALUE(node_id),
-
-static const uint32_t layer_color_table[] = {
-    DT_FOREACH_CHILD_STATUS_OKAY(DT_INST(0, zmk_keymap), LAYER_COLOR_ENTRY)};
-#endif
-
-#if defined(CONFIG_BOARD_HATSU_LEFT) && LAYER_COLORS_ENABLED
-BUILD_ASSERT(LAYER_COLOR_VALUE(DT_INST_CHILD(DT_INST(0, zmk_keymap), layer_2)) != 0,
-             "layer indicator color dropped (num)");
-BUILD_ASSERT(LAYER_COLOR_VALUE(DT_INST_CHILD(DT_INST(0, zmk_keymap), layer_3)) != 0,
-             "layer indicator color dropped (function)");
-BUILD_ASSERT(LAYER_COLOR_VALUE(DT_INST_CHILD(DT_INST(0, zmk_keymap), layer_4)) != 0,
-             "layer indicator color dropped (gaming)");
-BUILD_ASSERT(LAYER_COLOR_VALUE(DT_INST_CHILD(DT_INST(0, zmk_keymap), layer_6)) != 0,
-             "layer indicator color dropped (mouse)");
+BUILD_ASSERT(ARRAY_SIZE(layer_color_table) == ZMK_KEYMAP_LAYERS_LEN,
+             "zmk,layer-colors table length must match keymap layers");
+BUILD_ASSERT(DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 1) != 0 &&
+                 DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 2) != 0 &&
+                 DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 3) != 0 &&
+                 DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 5) != 0,
+             "layer indicator colors missing from devicetree");
 #endif
 
 enum indicator_state {

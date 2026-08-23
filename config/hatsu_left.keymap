@@ -53,7 +53,6 @@
 
         layer_2 {
             label = "num";
-            indicator { compatible = "hatsu,layer-indicator"; color = <0x00FFFF>; };
             bindings = <
         &kp F11 &kp F7         &kp F5        &kp F3        &kp F1        &kp F9        &kp F10     &kp F2          &kp  F4       &kp F6        &kp F8 &kp F12
         &none &bhm LSHIFT N7  &bhm LALT N5  &bhm LGUI N3  &bhm LCTRL N1 &kp N9        &kp N0      &bhm LCTRL N2   &bhm LGUI N4  &bhm LALT N6  &bhm LSHIFT N8 &none
@@ -67,7 +66,6 @@
 
         layer_3 {
             label = "function";
-            indicator { compatible = "hatsu,layer-indicator"; color = <0xFF00FF>; };
             bindings = <
         &none &kp ESC         &kp HOME      &kp UP        &kp END       &none         &bootloader	&tog 5          &tog 6        &none         &kp DEL &none
         &none &kp TAB         &kp LEFT      &kp DOWN      &kp RIGHT     &none         &none       &kp LCTRL       &kp LGUI      &kp LALT      &bhm LSHIFT K_CMENU &none
@@ -81,7 +79,6 @@
 
         layer_4 {
             label = "gaming";
-            indicator { compatible = "hatsu,layer-indicator"; color = <0xFF8000>; };
             bindings = <
              &kp ESC &kp Q &kp W &kp E &kp R &kp T           &kp Y &kp U &kp I &kp O &kp P &none
             &kp TAB &kp A &kp S &kp D &kp F &kp G     &kp H &kp J &kp K &kp L &kp SEMICOLON &none
@@ -108,7 +105,6 @@
 
         layer_6 {
             label = "mouse";
-            indicator { compatible = "hatsu,layer-indicator"; color = <0xFFFF00>; };
             bindings = <
             &trans &trans &trans &trans &trans &trans                &mkp LCLK       &mkp MCLK       &mkp RCLK     &trans          &trans &trans
             &trans &trans &trans &trans &trans &trans                &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_UP  &mmv MOVE_RIGHT &trans &trans
@@ -132,5 +128,14 @@
                         &trans &trans                                             &trans &trans
             >;
         };
+    };
+
+    chosen {
+        zmk,layer-colors = &layer_colors;
+    };
+
+    layer_colors: layer_colors {
+        compatible = "zmk,layer-colors";
+        colors = <0x000000 0x00FFFF 0xFF00FF 0xFF8000 0x000000 0xFFFF00 0x000000>;
     };
 };

@@ -1,8 +1,0 @@
-description: Per-layer RGB indicator color for a keymap layer
-
-compatible: "hatsu,layer-indicator"
-
-properties:
-  color:
-    type: int
-    required: true

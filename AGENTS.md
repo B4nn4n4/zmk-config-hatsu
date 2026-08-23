@@ -35,11 +35,11 @@ no local toolchain here.
   PWM register. Callers pass child **ordinal** (`DT_NODE_CHILD_IDX`)
 - `drivers/sensor/cw2015/` — fuel gauge (read-only; no charge control exists)
 - `src/` — backlight-map (custom `zmk_backlight_*` impl), battery_indicator, behaviors.
-  Battery indicator doubles as the layer RGB display: layers opt in with an
-  `indicator { color = <0xRRGGBB>; };` subnode in their keymap layer definition — plain
-  properties on layer nodes are silently dropped by the `zmk,keymap` child-binding
-  whitelist, so the color must live in a subnode. Layer events only fire on the
-  central, so only the left half shows them
+  Battery indicator doubles as the layer RGB display: per-layer colors live in a
+  top-level `layer_colors` node in the keymap (`compatible = "zmk,layer-colors"`, one
+  uint32 per layer index, 0 = no color), selected via `chosen { zmk,layer-colors =
+  &layer_colors; }` — binding in `dts/bindings/zmk,layer-colors.yaml`. Layer events
+  only fire on the central, so only the left half shows them
 - `config/hatsu_{left,right}.keymap` — NOT hardlinked anymore: `hatsu_left.keymap`
   (canonical, actively edited) and `hatsu_right.keymap` have drifted apart. Custom
   behavior nodes live in the keymap overlay (ZMK compiles keymaps against a stub dts —
@@ -62,11 +62,14 @@ no local toolchain here.
 - `CONFIG_SETTINGS` must be on BOTH halves or split pairing is lost on reset
 - Right half is the BLE peripheral: no USB HID output, no keymap of its own (central
   resolves; behaviors route by locality)
-- Keymap layer children inherit the `zmk,keymap` child-binding **recursively**: custom
-  properties under layers are silently dropped unless the node has its own compatible +
-  binding. Data subnodes need e.g. `compatible = "hatsu,layer-indicator"` +
-  `dts/bindings/hatsu,layer-indicator.yaml`; BUILD_ASSERT tripwires in
-  battery_indicator.c catch drops at compile time on hatsu_left
+- Nodes whose compatible matches NO loaded binding lose all non-whitelisted props
+  SILENTLY (edtlib treats the node as unbound and skips validation); with a matching
+  binding, undeclared props become a hard error instead. Keymap layer children inherit
+  the `zmk,keymap` child-binding recursively. Even a dedicated subnode binding
+  (`hatsu,layer-indicator` + `compatible` on each `indicator {}`) still dropped props in
+  CI for reasons never pinned down — do NOT retry that scheme; use the separate
+  `zmk,layer-colors` chosen node (proven to compile green). BUILD_ASSERTs in
+  battery_indicator.c (`DT_PROP_BY_IDX != 0`) catch silent drops at compile time
 
 ## Hardware reference
 
