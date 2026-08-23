@@ -40,10 +40,13 @@ no local toolchain here.
   uint32 per layer index, 0 = no color), selected via `chosen { zmk,layer-colors =
   &layer_colors; }` — binding in `dts/bindings/zmk,layer-colors.yaml`. Layer events
   only fire on the central, so only the left half shows them
-- `config/hatsu_{left,right}.keymap` — NOT hardlinked anymore: `hatsu_left.keymap`
-  (canonical, actively edited) and `hatsu_right.keymap` have drifted apart. Custom
-  behavior nodes live in the keymap overlay (ZMK compiles keymaps against a stub dts —
-  board dts nodes are NOT visible there)
+- `config/hatsu_left.keymap` is the single source of truth; `config/hatsu_right.keymap`
+  is a git **symlink** to it (T in `git status` = typechange). The build requires a
+  file with that exact name per shield, and GLOBAL behaviors (`bootl`, `bat`) must
+  exist in the right firmware's devicetree even though the peripheral resolves no
+  bindings itself. Never convert back to separate files. Custom behavior nodes live
+  in the keymap overlay (ZMK compiles keymaps against a stub dts — board dts nodes
+  are NOT visible there)
 - `config/west.yml` — pins `zmkfirmware/zmk@main`; `config/hatsu_left.conf` enables Studio
 
 ## Hard-won gotchas (do not rediscover)
