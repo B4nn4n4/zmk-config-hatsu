@@ -313,7 +313,7 @@ static void indicator_work_handler(struct k_work *work) {
     }
 
     if (state_needs_ticks(state)) {
-        k_timer_start(&indicator_timer, K_NO_WAIT, K_MSEC(TICK_MS));
+        k_timer_start(&indicator_timer, K_MSEC(TICK_MS), K_MSEC(TICK_MS));
     } else {
         k_timer_stop(&indicator_timer);
     }
