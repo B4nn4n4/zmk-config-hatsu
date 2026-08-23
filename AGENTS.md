@@ -73,6 +73,12 @@ no local toolchain here.
   CI for reasons never pinned down — do NOT retry that scheme; use the separate
   `zmk,layer-colors` chosen node (proven to compile green). BUILD_ASSERTs in
   battery_indicator.c (`DT_PROP_BY_IDX != 0`) catch silent drops at compile time
+- ZMK compiles several events' implementations ONLY into the central build
+  (`app/CMakeLists.txt` wraps e.g. `layer_state_changed.c`, `endpoint_changed.c`,
+  `ble_active_profile_changed.c` in the `(!SPLIT || ROLE_CENTRAL)` block). Referencing
+  their `as_*()` accessors unconditionally breaks the PERIPHERAL link — gate every
+  reference with `KEYMAP_LOCAL` (`activity_state_changed`, `battery_state_changed`,
+  `position_state_changed`, `split_peripheral_status_changed` compile on both halves)
 - Layer colors mirror to the peripheral via the hidden GLOBAL behavior `lc`
   (`src/behaviors/behavior_layer_color.c`, never bound to a key): the central invokes it
   programmatically on layer/activity/peripheral-reconnect events, and
