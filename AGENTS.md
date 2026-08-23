@@ -35,10 +35,11 @@ no local toolchain here.
   PWM register. Callers pass child **ordinal** (`DT_NODE_CHILD_IDX`)
 - `drivers/sensor/cw2015/` — fuel gauge (read-only; no charge control exists)
 - `src/` — backlight-map (custom `zmk_backlight_*` impl), battery_indicator, behaviors.
-  Battery indicator doubles as the layer RGB display: per-layer colors come from the
-  `zmk,layer-colors` chosen node defined in the keymap overlay (table index = keymap
-  layer id, `0x000000` = no override). Layer events only fire on the central, so only
-  the left half shows them
+  Battery indicator doubles as the layer RGB display: layers opt in with an
+  `indicator { color = <0xRRGGBB>; };` subnode in their keymap layer definition — plain
+  properties on layer nodes are silently dropped by the `zmk,keymap` child-binding
+  whitelist, so the color must live in a subnode. Layer events only fire on the
+  central, so only the left half shows them
 - `config/hatsu_{left,right}.keymap` — NOT hardlinked anymore: `hatsu_left.keymap`
   (canonical, actively edited) and `hatsu_right.keymap` have drifted apart. Custom
   behavior nodes live in the keymap overlay (ZMK compiles keymaps against a stub dts —

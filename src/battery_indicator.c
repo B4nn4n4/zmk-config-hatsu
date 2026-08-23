@@ -82,10 +82,15 @@ static const uint8_t battery_indicator_map_array[] = {LISTIFY(
 static const uint8_t battery_indicator_color_map[] =
     DT_PROP(DT_CHOSEN(zmk_battery_indicator_map), colors);
 
-#define LAYER_COLORS_ENABLED DT_HAS_CHOSEN(zmk_layer_colors)
+#define LAYER_COLORS_ENABLED DT_HAS_COMPAT_STATUS_OKAY(zmk_keymap)
 
 #if LAYER_COLORS_ENABLED
-static const uint32_t layer_color_table[] = DT_PROP(DT_CHOSEN(zmk_layer_colors), colors);
+#define LAYER_COLOR_ENTRY(node_id)                                                             \
+    COND_CODE_1(DT_NODE_HAS_PROP(DT_CHILD(node_id, indicator), color),                         \
+                (DT_PROP(DT_CHILD(node_id, indicator), color),), (0,))
+
+static const uint32_t layer_color_table[] = {
+    DT_FOREACH_CHILD_STATUS_OKAY(DT_INST(0, zmk_keymap), LAYER_COLOR_ENTRY)};
 #endif
 
 enum indicator_state {
@@ -181,7 +186,7 @@ static uint8_t active_profile_led(void) {
 }
 
 static uint32_t highest_layer_color(void) {
-#if LAYER_COLORS_ENABLED && KEYMAP_LOCAL
+#if LAYER_COLORS_ENABLED
     int max = MIN(ARRAY_SIZE(layer_color_table), ZMK_KEYMAP_LAYERS_LEN);
 
     for (int i = max - 1; i >= 0; i--) {
