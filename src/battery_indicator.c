@@ -23,19 +23,12 @@
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/events/activity_state_changed.h>
-#include <zmk/events/ble_active_profile_changed.h>
 #include <zmk/events/endpoint_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/events/split_peripheral_status_changed.h>
 #include <zmk/events/position_state_changed.h>
 
 #define KEYMAP_LOCAL (!IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL))
-
-#define BLE_PROFILES_AVAILABLE (IS_ENABLED(CONFIG_ZMK_BLE) && KEYMAP_LOCAL)
-
-#if BLE_PROFILES_AVAILABLE
-#include <zmk/ble.h>
-#endif
 
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
 #include <zmk/usb.h>
@@ -48,7 +41,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define BLUE 2
 
 #define COLOR_BAT CONFIG_ZMK_BATTERY_INDICATOR_COLOR
-#define COLOR_PROFILE 0x0000FF
 #define COLOR_LOW 0xFF0000
 
 #define TICK_MS 100
@@ -91,6 +83,7 @@ BUILD_ASSERT(ARRAY_SIZE(layer_color_table) == ZMK_KEYMAP_LAYERS_LEN,
 BUILD_ASSERT(DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 1) != 0 &&
                  DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 2) != 0 &&
                  DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 3) != 0 &&
+                 DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 4) != 0 &&
                  DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 5) != 0,
              "layer indicator colors missing from devicetree");
 #endif
@@ -98,9 +91,6 @@ BUILD_ASSERT(DT_PROP_BY_IDX(DT_CHOSEN(zmk_layer_colors), colors, 1) != 0 &&
 enum indicator_state {
     IND_STATE_OFF,
     IND_STATE_BAT_BAR,
-    IND_STATE_PROFILE,
-    IND_STATE_PAIRING,
-    IND_STATE_HIGH,
     IND_STATE_LOW,
     IND_STATE_LAYER,
     IND_STATE_CHARGING,
@@ -179,16 +169,6 @@ static uint8_t pulse_brightness(void) {
     return (PULSE_PERIOD_TICKS - phase) * 255 / (PULSE_PERIOD_TICKS / 2);
 }
 
-static uint8_t active_profile_led(void) {
-#if BLE_PROFILES_AVAILABLE
-    int idx = zmk_ble_active_profile_index();
-    if (idx >= 0 && idx < NUM_RGB_LEDS) {
-        return idx;
-    }
-#endif
-    return 0;
-}
-
 static uint32_t highest_layer_color(void) {
 #if LAYER_COLORS_ENABLED
     int max = MIN(ARRAY_SIZE(layer_color_table), ZMK_KEYMAP_LAYERS_LEN);
@@ -211,17 +191,6 @@ static enum indicator_state evaluate_state(void) {
         return IND_STATE_BAT_BAR;
     }
 
-#if KEYMAP_LOCAL
-    if (zmk_keymap_layer_active(CONFIG_ZMK_BATTERY_INDICATOR_SYSTEM_LAYER)) {
-#if BLE_PROFILES_AVAILABLE
-        if (zmk_ble_active_profile_is_connected()) {
-            return IND_STATE_PROFILE;
-        }
-#endif
-        return IND_STATE_PAIRING;
-    }
-#endif
-
     uint8_t soc = zmk_battery_state_of_charge();
 
     if (soc < CONFIG_ZMK_BATTERY_INDICATOR_LOW_THRESHOLD) {
@@ -241,16 +210,11 @@ static enum indicator_state evaluate_state(void) {
     }
 #endif
 
-    if (soc > CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD) {
-        return IND_STATE_HIGH;
-    }
-
     return IND_STATE_OFF;
 }
 
 static bool state_needs_ticks(enum indicator_state state) {
-    return state == IND_STATE_BAT_BAR || state == IND_STATE_PAIRING ||
-           state == IND_STATE_HIGH || state == IND_STATE_CHARGING;
+    return state == IND_STATE_BAT_BAR || state == IND_STATE_CHARGING;
 }
 
 static void render(enum indicator_state state) {
@@ -267,19 +231,6 @@ static void render(enum indicator_state state) {
         break;
     case IND_STATE_BAT_BAR:
         set_bar_leds(COLOR_BAT, bar_length, 255);
-        break;
-    case IND_STATE_PROFILE:
-        for (int i = 0; i < NUM_RGB_LEDS; i++) {
-            set_led(i, COLOR_PROFILE, i == active_profile_led() ? 255 : 0);
-        }
-        break;
-    case IND_STATE_PAIRING:
-        for (int i = 0; i < NUM_RGB_LEDS; i++) {
-            set_led(i, COLOR_PROFILE, i == active_profile_led() ? pulse_brightness() : 0);
-        }
-        break;
-    case IND_STATE_HIGH:
-        set_all_leds(COLOR_BAT, pulse_brightness());
         break;
     case IND_STATE_LOW:
         set_all_leds(COLOR_LOW, 255);
@@ -396,9 +347,6 @@ ZMK_SUBSCRIPTION(battery_indicator, zmk_split_peripheral_status_changed);
 #endif
 ZMK_SUBSCRIPTION(battery_indicator, zmk_battery_state_changed);
 ZMK_SUBSCRIPTION(battery_indicator, zmk_activity_state_changed);
-#if BLE_PROFILES_AVAILABLE
-ZMK_SUBSCRIPTION(battery_indicator, zmk_ble_active_profile_changed);
-#endif
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
 ZMK_SUBSCRIPTION(battery_indicator, zmk_usb_conn_state_changed);
 #endif

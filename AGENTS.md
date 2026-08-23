@@ -37,9 +37,12 @@ no local toolchain here.
 - `src/` — backlight-map (custom `zmk_backlight_*` impl), battery_indicator, behaviors.
   Battery indicator doubles as the layer RGB display: per-layer colors live in a
   top-level `layer_colors` node in the keymap (`compatible = "zmk,layer-colors"`, one
-  uint32 per layer index, 0 = no color), selected via `chosen { zmk,layer-colors =
-  &layer_colors; }` — binding in `dts/bindings/zmk,layer-colors.yaml`. Layer events
-  only fire on the central, so only the left half shows them
+  uint32 per layer index — node names are offset by one, `layer_N` = index N-1;
+  system(4)=blue, reserved/default=0), selected via `chosen { zmk,layer-colors =
+  &layer_colors; }`. Layer state exists only on the central; peripherals receive the
+  active color through the `lc` relay behavior (see gotchas below). Indicator states:
+  dark > charging pulse > layer colors > low-batt red > `&bat` bar (ascending
+  precedence); there is deliberately NO full-battery pulse and no BT-profile display
 - `config/hatsu_left.keymap` is the single source of truth; `config/hatsu_right.keymap`
   is a git **symlink** to it (T in `git status` = typechange). The build requires a
   file with that exact name per shield, and GLOBAL behaviors (`bootl`, `bat`) must

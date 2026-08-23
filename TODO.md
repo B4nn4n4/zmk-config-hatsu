@@ -2,15 +2,13 @@
 
 ## Verify on hardware
 
-- Battery indicator states (priority order): `&bat` green bar > system-layer profile
-  position (blue, pulsing while unpaired) > SoC < 20% solid red > per-layer colors
-  (zmk,layer-colors chosen node) > USB charging pulse (any SoC while plugged in) >
-  SoC > 80% green pulse (unplugged only; hidden while a colored layer is active);
-  default layer is dark otherwise (idle sweep removed). Bar shows min 1 LED below 25% SoC
-- Profile LED orientation (profile 1 = leftmost RGB LED?)
-- Mirrored layer colors on right half: toggle num/function/gaming/mouse → both halves
-  match (incl. stacked layers); idle-sleep then wake on default layer → BOTH dark
-  (peripheral reconnect resend); charging pulse stays left-only by hardware limit
+- Battery indicator states (priority order): `&bat` green bar > SoC < 20% solid red >
+  per-layer colors incl. system=blue > USB charging pulse; default layer dark
+  otherwise. Green pulsing = charging ONLY (full-battery pulse and BT-profile display
+  removed — system layer is a normal colored layer now)
+- Mirrored layer colors on right half: toggle num/function/gaming/system/mouse → both
+  halves match (incl. stacked layers); idle-sleep then wake on default layer → BOTH
+  dark (peripheral reconnect resend); charging pulse stays per-half (VBUS sensing)
 - Deep sleep: halves sleep, wake on keypress, re-pair cleanly, indicator resumes
 
 ## Done

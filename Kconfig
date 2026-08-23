@@ -39,17 +39,9 @@ config ZMK_BATTERY_INDICATOR_COLOR
     hex "Battery indicator color, when indicating, as hex 0xRRGGBB"
     default 0x00FF00
 
-config ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD
-    int "State of charge percent above which the indicator pulses"
-    default 80
-
 config ZMK_BATTERY_INDICATOR_LOW_THRESHOLD
     int "State of charge percent below which the indicator shows solid red"
     default 20
-
-config ZMK_BATTERY_INDICATOR_SYSTEM_LAYER
-    int "Layer ID that shows the BT profile position while active"
-    default 4
 
 config ZMK_BATTERY_INDICATOR_CHARGING
     bool "Pulse the battery bar while USB power is connected"
