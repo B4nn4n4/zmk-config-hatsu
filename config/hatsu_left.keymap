@@ -67,7 +67,7 @@
         layer_3 {
             label = "function";
             bindings = <
-        &none &kp ESC         &kp HOME      &kp UP        &kp END       &none         &bootloader	&tog 5          &tog 6        &none         &kp DEL &none
+        &none &kp ESC         &kp HOME      &kp UP        &kp END       &none         &bootloader	&tog 3          &none        &none         &kp DEL &none
         &none &kp TAB         &kp LEFT      &kp DOWN      &kp RIGHT     &none         &none       &kp LCTRL       &kp LGUI      &kp LALT      &bhm LSHIFT K_CMENU &none
         &none &none          &kp C_PREV    &kp C_PP      &kp C_NEXT    &none         &sys_reset  &none           &none         &none         &none &none
                         &trans &trans                                             &trans &trans
@@ -80,9 +80,9 @@
         layer_4 {
             label = "gaming";
             bindings = <
-             &kp ESC &kp Q &kp W &kp E &kp R &kp T           &kp Y &kp U &kp I &kp O &kp P &none
-            &kp TAB &kp A &kp S &kp D &kp F &kp G     &kp H &kp J &kp K &kp L &kp SEMICOLON &none
-            &none &kp Z &kp X &kp C &kp V &kp B         &kp N &kp M &kp COMMA &kp PERIOD &kp SLASH &none	                
+            &none &kp ESC &kp Q &kp W &kp E &kp R           &kp Y &kp U &kp I &kp O &kp P &none
+            &none &kp TAB &kp A &kp S &kp D &kp F     &kp H &kp J &kp K &kp L &kp SEMICOLON &none
+            &none &none &kp Z &kp X &kp C &kp V         &kp N &kp M &kp COMMA &kp PERIOD &kp SLASH &none	                
 	       		&trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
