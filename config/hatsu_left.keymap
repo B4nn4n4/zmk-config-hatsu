@@ -34,6 +34,14 @@
             display-name = "Bootloader";
             #binding-cells = <0>;
         };
+
+        // Hidden GLOBAL behavior used to relay layer indicator colors to the
+        // peripheral half; never bound to any key.
+        lc: lc {
+            compatible = "zmk,behavior-layer-color";
+            display-name = "Layer Color Relay";
+            #binding-cells = <0>;
+        };
     };
 
     keymap {
@@ -86,7 +94,7 @@
 	       		&trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
                         &trans &trans                                             &trans &trans
-                        &trans &trans                                             &trans &trans
+                        &trans &trans                                             &tog 1 &trans
             >;
         };
 

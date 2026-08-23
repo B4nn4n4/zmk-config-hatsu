@@ -8,6 +8,9 @@
   SoC > 80% green pulse (unplugged only; hidden while a colored layer is active);
   default layer is dark otherwise (idle sweep removed). Bar shows min 1 LED below 25% SoC
 - Profile LED orientation (profile 1 = leftmost RGB LED?)
+- Mirrored layer colors on right half: toggle num/function/gaming/mouse → both halves
+  match (incl. stacked layers); idle-sleep then wake on default layer → BOTH dark
+  (peripheral reconnect resend); charging pulse stays left-only by hardware limit
 - Deep sleep: halves sleep, wake on keypress, re-pair cleanly, indicator resumes
 
 ## Done

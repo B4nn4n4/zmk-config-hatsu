@@ -73,6 +73,13 @@ no local toolchain here.
   CI for reasons never pinned down — do NOT retry that scheme; use the separate
   `zmk,layer-colors` chosen node (proven to compile green). BUILD_ASSERTs in
   battery_indicator.c (`DT_PROP_BY_IDX != 0`) catch silent drops at compile time
+- Layer colors mirror to the peripheral via the hidden GLOBAL behavior `lc`
+  (`src/behaviors/behavior_layer_color.c`, never bound to a key): the central invokes it
+  programmatically on layer/activity/peripheral-reconnect events, and
+  `zmk_behavior_invoke_binding()` fans GLOBAL invocations out over the split transport
+  with param1 carrying the RGB24 color. Limitations: charging pulse can NOT be mirrored
+  (right-half USB is charge-only, no VBUS sensing); if upstream lands split layer-state
+  sync (zmk issue #3376) this relay can be replaced wholesale
 
 ## Hardware reference
 

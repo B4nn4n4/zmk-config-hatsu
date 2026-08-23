@@ -13,10 +13,12 @@
 
 #include <zephyr/logging/log.h>
 
+#include <drivers/behavior.h>
 #include <zmk/workqueue.h>
 #include <zmk/activity.h>
 #include <zmk/battery.h>
 #include <zmk/keymap.h>
+#include <zmk/behavior.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/layer_state_changed.h>
 #include <zmk/events/battery_state_changed.h>
@@ -24,6 +26,8 @@
 #include <zmk/events/ble_active_profile_changed.h>
 #include <zmk/events/endpoint_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
+#include <zmk/events/split_peripheral_status_changed.h>
+#include <zmk/events/position_state_changed.h>
 
 #define KEYMAP_LOCAL (!IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL))
 
@@ -107,6 +111,9 @@ static enum zmk_activity_state activity_state = ZMK_ACTIVITY_ACTIVE;
 static int64_t bat_show_until;
 static uint32_t tick;
 static uint32_t layer_color;
+
+// Mirrored from the central by the lc behavior on split peripherals.
+static uint32_t remote_layer_color;
 
 static int set_led(uint8_t led, uint32_t color, uint8_t brightness) {
     int err = 0;
@@ -221,8 +228,8 @@ static enum indicator_state evaluate_state(void) {
         return IND_STATE_LOW;
     }
 
-#if KEYMAP_LOCAL
-    layer_color = highest_layer_color();
+#if LAYER_COLORS_ENABLED
+    layer_color = KEYMAP_LOCAL ? highest_layer_color() : remote_layer_color;
     if (layer_color != 0) {
         return IND_STATE_LAYER;
     }
@@ -313,6 +320,35 @@ static void indicator_work_handler(struct k_work *work) {
 
 K_WORK_DEFINE(indicator_work, indicator_work_handler);
 
+void zmk_battery_indicator_set_remote_layer_color(uint32_t color) {
+    remote_layer_color = color;
+    k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_work);
+}
+
+#if KEYMAP_LOCAL && LAYER_COLORS_ENABLED
+// Invokes the hidden GLOBAL `lc` behavior; the central-side invocation fans out over
+// the split transport to every peripheral (and runs locally), mirroring layer colors.
+static void send_remote_layer_color(void) {
+    const struct zmk_behavior_binding binding = {
+        .behavior_dev = "lc",
+        .param1 = highest_layer_color(),
+        .param2 = 0,
+    };
+    const struct zmk_behavior_binding_event event = {
+        .layer = 0,
+        .position = 0,
+        .timestamp = k_uptime_get(),
+#if IS_ENABLED(CONFIG_ZMK_SPLIT)
+        .source = ZMK_POSITION_STATE_CHANGE_SOURCE_LOCAL,
+#endif
+    };
+    int err = zmk_behavior_invoke_binding(&binding, event, true);
+    if (err) {
+        LOG_ERR("Failed to relay layer color: %d", err);
+    }
+}
+#endif
+
 static void indicator_timer_handler(struct k_timer *timer) {
     tick++;
     k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_work);
@@ -327,10 +363,21 @@ int zmk_battery_indicator_show(void) {
 
 static int indicator_event_listener(const zmk_event_t *eh) {
     const struct zmk_activity_state_changed *activity_ev = as_zmk_activity_state_changed(eh);
+    const struct zmk_layer_state_changed *layer_ev = as_zmk_layer_state_changed(eh);
+    const struct zmk_split_peripheral_status_changed *periph_ev =
+        as_zmk_split_peripheral_status_changed(eh);
 
     if (activity_ev) {
         activity_state = activity_ev->state;
     }
+
+#if KEYMAP_LOCAL && LAYER_COLORS_ENABLED
+    // Relay on layer changes, on wake from idle, and when a peripheral reconnects
+    // (it missed every update while asleep).
+    if (layer_ev || activity_ev || (periph_ev && periph_ev->connected)) {
+        send_remote_layer_color();
+    }
+#endif
 
     k_work_submit_to_queue(zmk_workqueue_lowprio_work_q(), &indicator_work);
     return ZMK_EV_EVENT_BUBBLE;
@@ -340,6 +387,9 @@ ZMK_LISTENER(battery_indicator, indicator_event_listener);
 #if KEYMAP_LOCAL
 ZMK_SUBSCRIPTION(battery_indicator, zmk_layer_state_changed);
 ZMK_SUBSCRIPTION(battery_indicator, zmk_endpoint_changed);
+#if LAYER_COLORS_ENABLED
+ZMK_SUBSCRIPTION(battery_indicator, zmk_split_peripheral_status_changed);
+#endif
 #endif
 ZMK_SUBSCRIPTION(battery_indicator, zmk_battery_state_changed);
 ZMK_SUBSCRIPTION(battery_indicator, zmk_activity_state_changed);
