@@ -5,11 +5,10 @@
 - Battery indicator states (priority order): `&bat` green bar > system-layer profile
   position (blue, pulsing while unpaired) > SoC < 20% solid red > per-layer colors
   (zmk,layer-colors chosen node) > USB charging pulse (any SoC while plugged in) >
-  SoC > 80% green pulse (unplugged only; hidden while a colored layer is active) >
-  idle sweep animation
+  SoC > 80% green pulse (unplugged only; hidden while a colored layer is active);
+  default layer is dark otherwise (idle sweep removed). Bar shows min 1 LED below 25% SoC
 - Profile LED orientation (profile 1 = leftmost RGB LED?)
 - Deep sleep: halves sleep, wake on keypress, re-pair cleanly, indicator resumes
-- Idle animation brightness (`IDLE_PEAK` in `src/battery_indicator.c`) — may want tuning
 
 ## Done
 

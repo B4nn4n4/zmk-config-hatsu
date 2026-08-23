@@ -46,14 +46,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define COLOR_BAT CONFIG_ZMK_BATTERY_INDICATOR_COLOR
 #define COLOR_PROFILE 0x0000FF
 #define COLOR_LOW 0xFF0000
-#define COLOR_WHITE 0xFFFFFF
 
 #define TICK_MS 100
 #define PULSE_PERIOD_TICKS 20
-
-#define IDLE_STEP_TICKS 8
-#define IDLE_PEAK 40
-#define IDLE_FALLOFF 18
 
 static const struct device *const battery_indicator_dev =
     DEVICE_DT_GET(DT_CHOSEN(zmk_battery_indicator));
@@ -105,7 +100,6 @@ enum indicator_state {
     IND_STATE_LOW,
     IND_STATE_LAYER,
     IND_STATE_CHARGING,
-    IND_STATE_IDLE,
 };
 
 static enum indicator_state last_state = IND_STATE_OFF;
@@ -244,17 +238,21 @@ static enum indicator_state evaluate_state(void) {
         return IND_STATE_HIGH;
     }
 
-    return IND_STATE_IDLE;
+    return IND_STATE_OFF;
 }
 
 static bool state_needs_ticks(enum indicator_state state) {
     return state == IND_STATE_BAT_BAR || state == IND_STATE_PAIRING ||
-           state == IND_STATE_HIGH || state == IND_STATE_CHARGING || state == IND_STATE_IDLE;
+           state == IND_STATE_HIGH || state == IND_STATE_CHARGING;
 }
 
 static void render(enum indicator_state state) {
     uint8_t soc = zmk_battery_state_of_charge();
     uint8_t bar_length = ((uint32_t)soc * NUM_RGB_LEDS) / 100;
+
+    if (soc > 0 && bar_length == 0) {
+        bar_length = 1;
+    }
 
     switch (state) {
     case IND_STATE_OFF:
@@ -285,16 +283,6 @@ static void render(enum indicator_state state) {
     case IND_STATE_CHARGING:
         set_bar_leds(COLOR_BAT, bar_length, pulse_brightness());
         break;
-    case IND_STATE_IDLE: {
-        static const uint8_t sweep[] = {0, 1, 2, 3, 2, 1};
-        uint8_t pos = sweep[(tick / IDLE_STEP_TICKS) % ARRAY_SIZE(sweep)];
-
-        for (int i = 0; i < NUM_RGB_LEDS; i++) {
-            int brightness = IDLE_PEAK - abs(i - (int)pos) * IDLE_FALLOFF;
-            set_led(i, COLOR_WHITE, brightness > 0 ? brightness : 0);
-        }
-        break;
-    }
     }
 }
 
