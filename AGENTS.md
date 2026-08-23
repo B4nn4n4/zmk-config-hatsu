@@ -34,10 +34,15 @@ no local toolchain here.
 - `drivers/led/aw20216s.c` — LED driver; children ordered = LED numbers, `index` prop =
   PWM register. Callers pass child **ordinal** (`DT_NODE_CHILD_IDX`)
 - `drivers/sensor/cw2015/` — fuel gauge (read-only; no charge control exists)
-- `src/` — backlight-map (custom `zmk_backlight_*` impl), battery_indicator, behaviors
-- `config/hatsu_{left,right}.keymap` — hardlinks, same file. Custom behavior nodes live
-  in the keymap overlay (ZMK compiles keymaps against a stub dts — board dts nodes are
-  NOT visible there)
+- `src/` — backlight-map (custom `zmk_backlight_*` impl), battery_indicator, behaviors.
+  Battery indicator doubles as the layer RGB display: per-layer colors come from the
+  `zmk,layer-colors` chosen node defined in the keymap overlay (table index = keymap
+  layer id, `0x000000` = no override). Layer events only fire on the central, so only
+  the left half shows them
+- `config/hatsu_{left,right}.keymap` — NOT hardlinked anymore: `hatsu_left.keymap`
+  (canonical, actively edited) and `hatsu_right.keymap` have drifted apart. Custom
+  behavior nodes live in the keymap overlay (ZMK compiles keymaps against a stub dts —
+  board dts nodes are NOT visible there)
 - `config/west.yml` — pins `zmkfirmware/zmk@main`; `config/hatsu_left.conf` enables Studio
 
 ## Hard-won gotchas (do not rediscover)

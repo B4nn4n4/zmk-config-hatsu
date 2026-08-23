@@ -4,13 +4,17 @@
 
 - Battery indicator states (priority order): `&bat` green bar > system-layer profile
   position (blue, pulsing while unpaired) > SoC > 80% green pulse > SoC < 20% solid red >
-  layer 2/3 white indication > USB charging pulse > idle sweep animation
+  per-layer colors (keymap `zmk,layer-colors`) > USB charging pulse > idle sweep animation
 - Profile LED orientation (profile 1 = leftmost RGB LED?)
 - Deep sleep: halves sleep, wake on keypress, re-pair cleanly, indicator resumes
 - Idle animation brightness (`IDLE_PEAK` in `src/battery_indicator.c`) — may want tuning
 
 ## Done
 
+- [x] Per-layer RGB indication: `zmk,layer-colors` chosen node in the keymap (index =
+      layer id, `0x000000` = no override); num=cyan, function=magenta, gaming=orange,
+      mouse=yellow, system keeps BT-profile display. Replaces old upper/lower white
+      patterns and their Kconfig entries
 - [x] RGB battery indicator rework: state-based render loop with layer/BLE/battery/USB/
       activity event listeners; pink default removed; `&bat` bar now green; gentle idle
       sweep animation; layer 2 = white `[on on off off]`, layer 3 = white `[off off on on]`

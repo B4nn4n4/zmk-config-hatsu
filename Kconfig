@@ -51,14 +51,6 @@ config ZMK_BATTERY_INDICATOR_SYSTEM_LAYER
     int "Layer ID that shows the BT profile position while active"
     default 4
 
-config ZMK_BATTERY_INDICATOR_UPPER_LAYER
-    int "Layer ID indicated with the first two LEDs lit white"
-    default 2
-
-config ZMK_BATTERY_INDICATOR_LOWER_LAYER
-    int "Layer ID indicated with the last two LEDs lit white"
-    default 3
-
 config ZMK_BATTERY_INDICATOR_CHARGING
     bool "Pulse the battery bar while USB power is connected"
     default y

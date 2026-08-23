@@ -129,4 +129,13 @@
             >;
         };
     };
+
+    chosen {
+        zmk,layer-colors = &layer_colors;
+    };
+
+    layer_colors: layer_colors {
+        compatible = "zmk,layer-colors";
+        colors = <0x000000 0x00FFFF 0xFF00FF 0xFF8000 0x000000 0xFFFF00 0x000000>;
+    };
 };

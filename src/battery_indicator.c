@@ -82,6 +82,12 @@ static const uint8_t battery_indicator_map_array[] = {LISTIFY(
 static const uint8_t battery_indicator_color_map[] =
     DT_PROP(DT_CHOSEN(zmk_battery_indicator_map), colors);
 
+#define LAYER_COLORS_ENABLED DT_HAS_CHOSEN(zmk_layer_colors)
+
+#if LAYER_COLORS_ENABLED
+static const uint32_t layer_color_table[] = DT_PROP(DT_CHOSEN(zmk_layer_colors), colors);
+#endif
+
 enum indicator_state {
     IND_STATE_OFF,
     IND_STATE_BAT_BAR,
@@ -89,8 +95,7 @@ enum indicator_state {
     IND_STATE_PAIRING,
     IND_STATE_HIGH,
     IND_STATE_LOW,
-    IND_STATE_UPPER,
-    IND_STATE_LOWER,
+    IND_STATE_LAYER,
     IND_STATE_CHARGING,
     IND_STATE_IDLE,
 };
@@ -99,6 +104,7 @@ static enum indicator_state last_state = IND_STATE_OFF;
 static enum zmk_activity_state activity_state = ZMK_ACTIVITY_ACTIVE;
 static int64_t bat_show_until;
 static uint32_t tick;
+static uint32_t layer_color;
 
 static int set_led(uint8_t led, uint32_t color, uint8_t brightness) {
     int err = 0;
@@ -174,6 +180,19 @@ static uint8_t active_profile_led(void) {
     return 0;
 }
 
+static uint32_t highest_layer_color(void) {
+#if LAYER_COLORS_ENABLED && KEYMAP_LOCAL
+    int max = MIN(ARRAY_SIZE(layer_color_table), ZMK_KEYMAP_LAYERS_LEN);
+
+    for (int i = max - 1; i >= 0; i--) {
+        if (layer_color_table[i] != 0 && zmk_keymap_layer_active((zmk_keymap_layer_id_t)i)) {
+            return layer_color_table[i];
+        }
+    }
+#endif
+    return 0;
+}
+
 static enum indicator_state evaluate_state(void) {
     if (activity_state != ZMK_ACTIVITY_ACTIVE) {
         return IND_STATE_OFF;
@@ -205,12 +224,9 @@ static enum indicator_state evaluate_state(void) {
     }
 
 #if KEYMAP_LOCAL
-    if (zmk_keymap_layer_active(CONFIG_ZMK_BATTERY_INDICATOR_UPPER_LAYER)) {
-        return IND_STATE_UPPER;
-    }
-
-    if (zmk_keymap_layer_active(CONFIG_ZMK_BATTERY_INDICATOR_LOWER_LAYER)) {
-        return IND_STATE_LOWER;
+    layer_color = highest_layer_color();
+    if (layer_color != 0) {
+        return IND_STATE_LAYER;
     }
 #endif
 
@@ -255,17 +271,8 @@ static void render(enum indicator_state state) {
     case IND_STATE_LOW:
         set_all_leds(COLOR_LOW, 255);
         break;
-    case IND_STATE_UPPER:
-        set_led(0, COLOR_WHITE, 255);
-        set_led(1, COLOR_WHITE, 255);
-        set_led(2, COLOR_WHITE, 0);
-        set_led(3, COLOR_WHITE, 0);
-        break;
-    case IND_STATE_LOWER:
-        set_led(0, COLOR_WHITE, 0);
-        set_led(1, COLOR_WHITE, 0);
-        set_led(2, COLOR_WHITE, 255);
-        set_led(3, COLOR_WHITE, 255);
+    case IND_STATE_LAYER:
+        set_all_leds(layer_color, 255);
         break;
     case IND_STATE_CHARGING:
         set_bar_leds(COLOR_BAT, bar_length, pulse_brightness());
