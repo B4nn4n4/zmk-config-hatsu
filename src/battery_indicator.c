@@ -234,15 +234,15 @@ static enum indicator_state evaluate_state(void) {
     }
 #endif
 
-    if (soc > CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD) {
-        return IND_STATE_HIGH;
-    }
-
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK) && IS_ENABLED(CONFIG_ZMK_BATTERY_INDICATOR_CHARGING)
     if (zmk_usb_is_powered()) {
         return IND_STATE_CHARGING;
     }
 #endif
+
+    if (soc > CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD) {
+        return IND_STATE_HIGH;
+    }
 
     return IND_STATE_IDLE;
 }
