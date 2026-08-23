@@ -12,11 +12,11 @@
 
 ## Done
 
-- [x] Per-layer RGB indication: `indicator { color = <...>; };` subnodes inside keymap
-      layer definitions (plain props on layer nodes get dropped by the zmk,keymap
-      child-binding); num=cyan, function=magenta, gaming=orange, mouse=yellow, system
-      keeps BT-profile display. Replaces old upper/lower white patterns and their
-      Kconfig entries
+- [x] Per-layer RGB indication: `indicator { compatible = "hatsu,layer-indicator";
+      color = <...>; };` subnodes inside keymap layer definitions (child-binding
+      recursion drops undeclared props, hence the dedicated binding); num=cyan,
+      function=magenta, gaming=orange, mouse=yellow, system keeps BT-profile display.
+      Replaces old upper/lower white patterns and their Kconfig entries
 - [x] RGB battery indicator rework: state-based render loop with layer/BLE/battery/USB/
       activity event listeners; pink default removed; `&bat` bar now green; gentle idle
       sweep animation; layer 2 = white `[on on off off]`, layer 3 = white `[off off on on]`

@@ -93,6 +93,12 @@ static const uint32_t layer_color_table[] = {
     DT_FOREACH_CHILD_STATUS_OKAY(DT_INST(0, zmk_keymap), LAYER_COLOR_ENTRY)};
 #endif
 
+#if defined(CONFIG_BOARD_HATSU_LEFT)
+BUILD_ASSERT(layer_color_table[1] != 0 && layer_color_table[2] != 0 &&
+                 layer_color_table[3] != 0 && layer_color_table[5] != 0,
+             "layer indicator colors dropped from devicetree");
+#endif
+
 enum indicator_state {
     IND_STATE_OFF,
     IND_STATE_BAT_BAR,

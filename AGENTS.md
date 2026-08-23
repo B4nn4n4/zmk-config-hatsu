@@ -62,6 +62,11 @@ no local toolchain here.
 - `CONFIG_SETTINGS` must be on BOTH halves or split pairing is lost on reset
 - Right half is the BLE peripheral: no USB HID output, no keymap of its own (central
   resolves; behaviors route by locality)
+- Keymap layer children inherit the `zmk,keymap` child-binding **recursively**: custom
+  properties under layers are silently dropped unless the node has its own compatible +
+  binding. Data subnodes need e.g. `compatible = "hatsu,layer-indicator"` +
+  `dts/bindings/hatsu,layer-indicator.yaml`; BUILD_ASSERT tripwires in
+  battery_indicator.c catch drops at compile time on hatsu_left
 
 ## Hardware reference
 
