@@ -193,10 +193,6 @@ static enum indicator_state evaluate_state(void) {
 
     uint8_t soc = zmk_battery_state_of_charge();
 
-    if (soc < CONFIG_ZMK_BATTERY_INDICATOR_LOW_THRESHOLD) {
-        return IND_STATE_LOW;
-    }
-
 #if LAYER_COLORS_ENABLED
     layer_color = KEYMAP_LOCAL ? highest_layer_color() : remote_layer_color;
     if (layer_color != 0) {
@@ -205,10 +201,16 @@ static enum indicator_state evaluate_state(void) {
 #endif
 
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK) && IS_ENABLED(CONFIG_ZMK_BATTERY_INDICATOR_CHARGING)
+    // Charging outranks low-batt red so the bar shows charge progress while plugged
+    // in; unplug and a <20% cell goes back to solid red.
     if (zmk_usb_is_powered()) {
         return IND_STATE_CHARGING;
     }
 #endif
+
+    if (soc < CONFIG_ZMK_BATTERY_INDICATOR_LOW_THRESHOLD) {
+        return IND_STATE_LOW;
+    }
 
     return IND_STATE_OFF;
 }

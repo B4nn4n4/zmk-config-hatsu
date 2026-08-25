@@ -2,10 +2,10 @@
 
 ## Verify on hardware
 
-- Battery indicator states (priority order): `&bat` green bar > SoC < 20% solid red >
-  per-layer colors incl. system=blue > USB charging pulse; default layer dark
-  otherwise. Green pulsing = charging ONLY (full-battery pulse and BT-profile display
-  removed — system layer is a normal colored layer now)
+- Battery indicator states (priority order): `&bat` green bar > per-layer colors incl.
+  system=blue > USB charging pulse (outranks low-batt so plugged-in cells show charge
+  progress) > SoC < 20% solid red (unplugged only); default layer dark otherwise.
+  Green pulsing = charging ONLY
 - Mirrored layer colors on right half: toggle num/function/gaming/system/mouse → both
   halves match (incl. stacked layers); idle-sleep then wake on default layer → BOTH
   dark (peripheral reconnect resend); charging pulse stays per-half (VBUS sensing)

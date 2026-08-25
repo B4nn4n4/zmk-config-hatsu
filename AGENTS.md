@@ -40,9 +40,10 @@ no local toolchain here.
   uint32 per layer index — node names are offset by one, `layer_N` = index N-1;
   system(4)=blue, reserved/default=0), selected via `chosen { zmk,layer-colors =
   &layer_colors; }`. Layer state exists only on the central; peripherals receive the
-  active color through the `lc` relay behavior (see gotchas below). Indicator states:
-  dark > charging pulse > layer colors > low-batt red > `&bat` bar (ascending
-  precedence); there is deliberately NO full-battery pulse and no BT-profile display
+  active color through the `lc` relay behavior (see gotchas below). Indicator states,
+  ascending precedence: dark < low-batt red (unplugged only) < charging pulse <
+  layer colors < `&bat` bar; there is deliberately NO full-battery pulse and no
+  BT-profile display
 - `config/hatsu_left.keymap` is the single source of truth; `config/hatsu_right.keymap`
   is a git **symlink** to it (T in `git status` = typechange). The build requires a
   file with that exact name per shield, and GLOBAL behaviors (`bootl`, `bat`) must
