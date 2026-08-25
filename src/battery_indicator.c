@@ -93,6 +93,7 @@ enum indicator_state {
     IND_STATE_BAT_BAR,
     IND_STATE_LOW,
     IND_STATE_LAYER,
+    IND_STATE_FULL,
     IND_STATE_CHARGING,
 };
 
@@ -200,6 +201,10 @@ static enum indicator_state evaluate_state(void) {
     }
 #endif
 
+    if (soc >= CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD) {
+        return IND_STATE_FULL;
+    }
+
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK) && IS_ENABLED(CONFIG_ZMK_BATTERY_INDICATOR_CHARGING)
     // Charging outranks low-batt red so the bar shows charge progress while plugged
     // in; unplug and a <20% cell goes back to solid red.
@@ -239,6 +244,9 @@ static void render(enum indicator_state state) {
         break;
     case IND_STATE_LAYER:
         set_all_leds(layer_color, 255);
+        break;
+    case IND_STATE_FULL:
+        set_all_leds(COLOR_BAT, 255);
         break;
     case IND_STATE_CHARGING:
         set_bar_leds(COLOR_BAT, bar_length, pulse_brightness());
