@@ -9,6 +9,8 @@
 #include <zephyr/drivers/led.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
+#include <zephyr/pm/device.h>
+#include <zephyr/sys/poweroff.h>
 #include <zephyr/sys/util.h>
 
 #include <zephyr/logging/log.h>
@@ -45,6 +47,10 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define TICK_MS 100
 #define PULSE_PERIOD_TICKS 20
+
+// Custom sleep: stay awake while charging until SoC >= 80%.
+#define SLEEP_TIMEOUT_MS (15 * 60 * 1000) // 15 minutes idle before sleep is allowed
+#define CHARGE_TARGET_SOC CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD
 
 static const struct device *const battery_indicator_dev =
     DEVICE_DT_GET(DT_CHOSEN(zmk_battery_indicator));
@@ -102,6 +108,7 @@ static enum zmk_activity_state activity_state = ZMK_ACTIVITY_ACTIVE;
 static int64_t bat_show_until;
 static uint32_t tick;
 static uint32_t layer_color;
+static int64_t sleep_allowed_at; // custom sleep: timestamp when poweroff is permitted
 
 // Mirrored from the central by the lc behavior on split peripherals.
 static uint32_t remote_layer_color;
@@ -265,6 +272,19 @@ static void indicator_work_handler(struct k_work *work) {
             render(IND_STATE_OFF);
             last_state = IND_STATE_OFF;
         }
+
+        // Custom sleep: power off when idle long enough, unless charging below target.
+        if (activity_state == ZMK_ACTIVITY_IDLE && k_uptime_get() >= sleep_allowed_at) {
+            uint8_t soc = zmk_battery_state_of_charge();
+            bool charging = IS_ENABLED(CONFIG_USB_DEVICE_STACK) && zmk_usb_is_powered();
+
+            if (!charging || soc >= CHARGE_TARGET_SOC) {
+                k_timer_stop(&indicator_timer);
+                zmk_pm_suspend_devices();
+                sys_poweroff();
+            }
+        }
+
         return;
     }
 
@@ -327,6 +347,9 @@ static int indicator_event_listener(const zmk_event_t *eh) {
 
     if (activity_ev) {
         activity_state = activity_ev->state;
+        if (activity_ev->state == ZMK_ACTIVITY_IDLE) {
+            sleep_allowed_at = k_uptime_get() + SLEEP_TIMEOUT_MS;
+        }
     }
 
 #if KEYMAP_LOCAL && LAYER_COLORS_ENABLED
