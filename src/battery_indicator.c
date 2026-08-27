@@ -264,7 +264,7 @@ static void render(enum indicator_state state) {
 
 extern struct k_timer indicator_timer;
 
-static const struct device *suspended_devs[CONFIG_DEVICE_COUNT];
+static const struct device *suspended_devs[64];
 static size_t num_suspended;
 
 // Inline reimplementation of ZMK's zmk_pm_suspend_devices() (which is only
@@ -289,7 +289,7 @@ static int suspend_devices(void) {
             return ret;
         }
 
-        if (num_suspended < CONFIG_DEVICE_COUNT) {
+        if (num_suspended < ARRAY_SIZE(suspended_devs)) {
             suspended_devs[num_suspended++] = dev;
         }
     }
