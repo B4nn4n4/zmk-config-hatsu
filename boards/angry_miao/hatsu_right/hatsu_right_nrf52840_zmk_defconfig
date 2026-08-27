@@ -37,7 +37,6 @@ CONFIG_ZMK_BACKLIGHT_MAP=y
 
 # Custom sleep handled in battery_indicator.c; CONFIG_ZMK_SLEEP is off but
 # these are needed to link zmk_pm_suspend_devices() and sys_poweroff().
-CONFIG_ZMK_PM=y
 CONFIG_ZMK_PM_DEVICE_SUSPEND_RESUME=y
 CONFIG_PM_DEVICE=y
 CONFIG_POWEROFF=y
