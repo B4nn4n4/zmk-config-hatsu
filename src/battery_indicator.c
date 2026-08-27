@@ -10,6 +10,7 @@
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/pm/device.h>
+#include <zephyr/pm/device_runtime.h>
 #include <zephyr/sys/poweroff.h>
 #include <zephyr/sys/util.h>
 
@@ -263,6 +264,46 @@ static void render(enum indicator_state state) {
 
 extern struct k_timer indicator_timer;
 
+static const struct device *suspended_devs[CONFIG_DEVICE_COUNT];
+static size_t num_suspended;
+
+// Inline reimplementation of ZMK's zmk_pm_suspend_devices() (which is only
+// compiled when the hidden CONFIG_ZMK_SLEEP is set). Uses only public Zephyr PM
+// APIs; reverse-init order satisfies dependencies before system-off.
+static int suspend_devices(void) {
+    const struct device *devs;
+    size_t devc = z_device_get_all_static(&devs);
+    num_suspended = 0;
+
+    for (const struct device *dev = devs + devc - 1; dev >= devs; dev--) {
+        if (!device_is_ready(dev) || pm_device_is_busy(dev) ||
+            pm_device_wakeup_is_enabled(dev) || pm_device_runtime_is_enabled(dev)) {
+            continue;
+        }
+
+        int ret = pm_device_action_run(dev, PM_DEVICE_ACTION_SUSPEND);
+        if ((ret == -ENOSYS) || (ret == -ENOTSUP) || (ret == -EALREADY)) {
+            continue;
+        } else if (ret < 0) {
+            LOG_ERR("Device %s did not suspend (%d)", dev->name, ret);
+            return ret;
+        }
+
+        if (num_suspended < CONFIG_DEVICE_COUNT) {
+            suspended_devs[num_suspended++] = dev;
+        }
+    }
+
+    return 0;
+}
+
+static void resume_devices(void) {
+    for (size_t i = num_suspended; i > 0; i--) {
+        pm_device_action_run(suspended_devs[i - 1], PM_DEVICE_ACTION_RESUME);
+    }
+    num_suspended = 0;
+}
+
 static void indicator_work_handler(struct k_work *work) {
     enum indicator_state state = evaluate_state();
 
@@ -280,8 +321,11 @@ static void indicator_work_handler(struct k_work *work) {
 
             if (!charging || soc >= CHARGE_TARGET_SOC) {
                 k_timer_stop(&indicator_timer);
-                zmk_pm_suspend_devices();
-                sys_poweroff();
+                if (suspend_devices() == 0) {
+                    sys_poweroff();
+                } else {
+                    resume_devices();
+                }
             }
         }
 
