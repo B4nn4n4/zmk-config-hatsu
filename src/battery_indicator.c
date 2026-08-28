@@ -9,9 +9,6 @@
 #include <zephyr/drivers/led.h>
 #include <zephyr/init.h>
 #include <zephyr/kernel.h>
-#include <zephyr/pm/device.h>
-#include <zephyr/pm/device_runtime.h>
-#include <zephyr/sys/poweroff.h>
 #include <zephyr/sys/util.h>
 
 #include <zephyr/logging/log.h>
@@ -48,10 +45,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define TICK_MS 100
 #define PULSE_PERIOD_TICKS 20
-
-// Custom sleep: stay awake while charging until SoC >= 80%.
-#define SLEEP_TIMEOUT_MS (15 * 60 * 1000) // 15 minutes idle before sleep is allowed
-#define CHARGE_TARGET_SOC CONFIG_ZMK_BATTERY_INDICATOR_HIGH_THRESHOLD
 
 static const struct device *const battery_indicator_dev =
     DEVICE_DT_GET(DT_CHOSEN(zmk_battery_indicator));
@@ -109,7 +102,6 @@ static enum zmk_activity_state activity_state = ZMK_ACTIVITY_ACTIVE;
 static int64_t bat_show_until;
 static uint32_t tick;
 static uint32_t layer_color;
-static int64_t sleep_allowed_at; // custom sleep: timestamp when poweroff is permitted
 
 // Mirrored from the central by the lc behavior on split peripherals.
 static uint32_t remote_layer_color;
@@ -264,46 +256,6 @@ static void render(enum indicator_state state) {
 
 extern struct k_timer indicator_timer;
 
-static const struct device *suspended_devs[64];
-static size_t num_suspended;
-
-// Inline reimplementation of ZMK's zmk_pm_suspend_devices() (which is only
-// compiled when the hidden CONFIG_ZMK_SLEEP is set). Uses only public Zephyr PM
-// APIs; reverse-init order satisfies dependencies before system-off.
-static int suspend_devices(void) {
-    const struct device *devs;
-    size_t devc = z_device_get_all_static(&devs);
-    num_suspended = 0;
-
-    for (const struct device *dev = devs + devc - 1; dev >= devs; dev--) {
-        if (!device_is_ready(dev) || pm_device_is_busy(dev) ||
-            pm_device_wakeup_is_enabled(dev) || pm_device_runtime_is_enabled(dev)) {
-            continue;
-        }
-
-        int ret = pm_device_action_run(dev, PM_DEVICE_ACTION_SUSPEND);
-        if ((ret == -ENOSYS) || (ret == -ENOTSUP) || (ret == -EALREADY)) {
-            continue;
-        } else if (ret < 0) {
-            LOG_ERR("Device %s did not suspend (%d)", dev->name, ret);
-            return ret;
-        }
-
-        if (num_suspended < ARRAY_SIZE(suspended_devs)) {
-            suspended_devs[num_suspended++] = dev;
-        }
-    }
-
-    return 0;
-}
-
-static void resume_devices(void) {
-    for (size_t i = num_suspended; i > 0; i--) {
-        pm_device_action_run(suspended_devs[i - 1], PM_DEVICE_ACTION_RESUME);
-    }
-    num_suspended = 0;
-}
-
 static void indicator_work_handler(struct k_work *work) {
     enum indicator_state state = evaluate_state();
 
@@ -312,21 +264,6 @@ static void indicator_work_handler(struct k_work *work) {
         if (last_state != IND_STATE_OFF) {
             render(IND_STATE_OFF);
             last_state = IND_STATE_OFF;
-        }
-
-        // Custom sleep: power off when idle long enough, unless charging below target.
-        if (activity_state == ZMK_ACTIVITY_IDLE && k_uptime_get() >= sleep_allowed_at) {
-            uint8_t soc = zmk_battery_state_of_charge();
-            bool charging = IS_ENABLED(CONFIG_USB_DEVICE_STACK) && zmk_usb_is_powered();
-
-            if (!charging || soc >= CHARGE_TARGET_SOC) {
-                k_timer_stop(&indicator_timer);
-                if (suspend_devices() == 0) {
-                    sys_poweroff();
-                } else {
-                    resume_devices();
-                }
-            }
         }
 
         return;
@@ -391,9 +328,6 @@ static int indicator_event_listener(const zmk_event_t *eh) {
 
     if (activity_ev) {
         activity_state = activity_ev->state;
-        if (activity_ev->state == ZMK_ACTIVITY_IDLE) {
-            sleep_allowed_at = k_uptime_get() + SLEEP_TIMEOUT_MS;
-        }
     }
 
 #if KEYMAP_LOCAL && LAYER_COLORS_ENABLED

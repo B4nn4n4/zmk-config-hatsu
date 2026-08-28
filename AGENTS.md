@@ -99,5 +99,11 @@ no local toolchain here.
 
 - Per half: AW20216S (SPI) driving 26 white backlight LEDs + 4 RGB LEDs (battery bar),
   CW2015 fuel gauge (I2C), no reset button, no charge-control interface found
+- Sleep: upstream `CONFIG_ZMK_SLEEP=y` keeps the device awake while USB/charging is
+  present (ZMK's `is_usb_power_present()` guard), so the host never deasserts VBUS and
+  overnight USB charging completes; it deep-sleeps only when fully unplugged. Qi
+  charging is NOT detected by ZMK (`zmk_usb_is_powered()` is the only power source
+  check) but still charges during deep sleep via the hardware receiver (not firmware-
+  detectable/indicatable; schematics are confidential)
 - SWD pads: GND/IO/CLK (+3V on left), photo in `bootloader/pinout.png`
 - Backlight: `&bl` on SYSTEM layer; battery bar: `&bat`; profile/pair LEDs: see TODO.md

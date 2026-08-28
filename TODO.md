@@ -10,6 +10,9 @@
   halves match (incl. stacked layers); idle-sleep then wake on default layer → BOTH
   dark (peripheral reconnect resend); charging pulse stays per-half (VBUS sensing)
 - Deep sleep: halves sleep, wake on keypress, re-pair cleanly, indicator resumes
+- Overnight USB charge completes to 100% (device stays awake while plugged via
+  `CONFIG_ZMK_SLEEP`, so VBUS is never dropped); Qi pad charge also works — battery
+  reports full next morning (Qi itself isn't detected/indicated by firmware)
 
 ## Done
 
