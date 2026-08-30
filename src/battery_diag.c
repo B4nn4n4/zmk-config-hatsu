@@ -33,6 +33,10 @@ BUILD_ASSERT(DT_HAS_CHOSEN(zmk_battery),
 
 static const struct device *const diag_battery = DEVICE_DT_GET(DT_CHOSEN(zmk_battery));
 
+static void battery_diag_work(struct k_work *work);
+
+K_WORK_DELAYABLE_DEFINE(diag_work, battery_diag_work);
+
 static void battery_diag_work(struct k_work *work) {
     struct sensor_value vcell;
     struct sensor_value soc;
@@ -57,8 +61,6 @@ static void battery_diag_work(struct k_work *work) {
 reschedule:
     k_work_schedule(&diag_work, K_MSEC(CONFIG_ZMK_BATTERY_DIAG_INTERVAL_MS));
 }
-
-K_WORK_DELAYABLE_DEFINE(diag_work, battery_diag_work);
 
 static int battery_diag_init(void) {
     if (!device_is_ready(diag_battery)) {
