@@ -94,7 +94,8 @@ static int cw2015_sample_fetch(const struct device *dev, enum sensor_channel cha
         LOG_DBG("read soc: %d", drv_data->raw_state_of_charge);
         goto done;
     }
-    if (chan == SENSOR_CHAN_GAUGE_VOLTAGE || chan == SENSOR_CHAN_ALL) {
+    if (chan == SENSOR_CHAN_GAUGE_VOLTAGE || chan == SENSOR_CHAN_VOLTAGE ||
+        chan == SENSOR_CHAN_ALL) {
         err = read_register(dev, REG_VCELL, &drv_data->raw_vcell);
         if (err != 0) {
             LOG_WRN("failed to read vcell: %d", err);
@@ -134,6 +135,7 @@ static int cw2015_channel_get(const struct device *dev, enum sensor_channel chan
 
     switch (chan) {
     case SENSOR_CHAN_GAUGE_VOLTAGE:
+    case SENSOR_CHAN_VOLTAGE:
         // 1250 / 16 = 78.125
         tmp = data->raw_vcell * 305;
         val->val1 = tmp / 1000000;
