@@ -2,8 +2,9 @@
 # See https://zmk.dev/docs/customization#building-additional-keyboards
 ---
 include:
+  # Diagnostic: snippet dropped so USB CDC logging (ZMK_USB_LOGGING) can use the
+  # USB CDC ACM console. Restore the snippet when done diagnosing.
   - board: hatsu_left//zmk
-    snippet: studio-rpc-usb-uart
   - board: hatsu_right//zmk
   # Wipes the settings partition (split-pairing bonds, BT bonds).
   # Flash to BOTH halves when they refuse to pair, then reflash normal firmware.
